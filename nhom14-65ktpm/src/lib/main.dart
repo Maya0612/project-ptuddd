@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/supabase_config.dart';
+import 'screens/login_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Nhóm 14 - Hỗ Trợ Đồ Án Tốt Nghiệp'),
+      home: const LoginScreen(),
     );
   }
 }
