@@ -27,7 +27,7 @@ void main() {
 
     // 1. Kiểm tra tiêu đề và thông tin
     expect(find.text('Tạo Tài Khoản Mới'), findsOneWidget);
-    expect(find.text('Hệ Thống Hỗ Trợ Đồ Án Tốt Nghiệp'), findsOneWidget);
+    expect(find.text('HỆ THỐNG HỖ TRỢ ĐỒ ÁN TỐT NGHIỆP CHO SINH VIÊN'), findsOneWidget);
 
     // 2. Kiểm tra đủ 4 trường nhập liệu
     expect(find.byType(TextFormField), findsNWidgets(4));
@@ -126,7 +126,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Quay lại màn hình Đăng nhập
-    expect(find.text('Hệ Thống Hỗ Trợ Đồ Án'), findsOneWidget);
+    expect(find.text('HỆ THỐNG HỖ TRỢ ĐỒ ÁN TỐT NGHIỆP CHO SINH VIÊN'), findsOneWidget);
     expect(find.text('Đăng nhập để tiếp tục'), findsOneWidget);
   });
 }

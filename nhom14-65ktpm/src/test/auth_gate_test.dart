@@ -15,7 +15,7 @@ void main() {
       );
 
       // 1. Kiểm tra tiêu đề và thông điệp kiểm tra phiên
-      expect(find.text('Hệ Thống Hỗ Trợ Đồ Án'), findsOneWidget);
+      expect(find.text('HỆ THỐNG HỖ TRỢ ĐỒ ÁN TỐT NGHIỆP CHO SINH VIÊN'), findsOneWidget);
       expect(find.text('Đang kiểm tra phiên đăng nhập...'), findsOneWidget);
 
       // 2. Kiểm tra biểu tượng trường học và tiến trình loading

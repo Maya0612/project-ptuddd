@@ -7,14 +7,14 @@ void main() {
     await tester.pumpWidget(const MyApp());
 
     // Trong khung hình đầu tiên, hiển thị SplashLoadingView
-    expect(find.text('Hệ Thống Hỗ Trợ Đồ Án'), findsOneWidget);
+    expect(find.text('HỆ THỐNG HỖ TRỢ ĐỒ ÁN TỐT NGHIỆP CHO SINH VIÊN'), findsOneWidget);
     expect(find.text('Đang kiểm tra phiên đăng nhập...'), findsOneWidget);
 
     // Chờ quá trình kiểm tra phiên ban đầu hoàn thành
     await tester.pumpAndSettle();
 
     // Chưa đăng nhập -> tự động chuyển sang LoginScreen
-    expect(find.text('Hệ Thống Hỗ Trợ Đồ Án'), findsOneWidget);
+    expect(find.text('HỆ THỐNG HỖ TRỢ ĐỒ ÁN TỐT NGHIỆP CHO SINH VIÊN'), findsOneWidget);
     expect(find.text('Đăng nhập'), findsOneWidget);
     expect(find.byType(TextFormField), findsNWidgets(2));
   });

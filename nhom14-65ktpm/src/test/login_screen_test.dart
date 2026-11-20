@@ -11,7 +11,7 @@ void main() {
     );
 
     // 1. Hiển thị đúng các thành phần ban đầu
-    expect(find.text('Hệ Thống Hỗ Trợ Đồ Án'), findsOneWidget);
+    expect(find.text('HỆ THỐNG HỖ TRỢ ĐỒ ÁN TỐT NGHIỆP CHO SINH VIÊN'), findsOneWidget);
     expect(find.text('Đăng nhập để tiếp tục'), findsOneWidget);
     expect(find.text('Đăng nhập'), findsOneWidget);
     expect(find.byType(TextFormField), findsNWidgets(2));

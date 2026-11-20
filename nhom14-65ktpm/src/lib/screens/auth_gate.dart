@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/supabase_config.dart';
 import '../core/theme/app_theme.dart';
-import '../main.dart';
+import 'home_screen.dart';
 import 'login_screen.dart';
 
 /// Cổng kiểm soát và điều hướng xác thực (AuthGate):
@@ -98,8 +98,8 @@ class _AuthGateState extends State<AuthGate> {
     }
 
     if (_session != null) {
-      return const MyHomePage(
-        title: 'Hệ Thống Hỗ Trợ Đồ Án - Nhóm 14',
+      return const HomeScreen(
+        title: 'HỆ THỐNG HỖ TRỢ ĐỒ ÁN TỐT NGHIỆP CHO SINH VIÊN',
       );
     }
 
@@ -118,41 +118,32 @@ class SplashLoadingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primaryBackground,
+      backgroundColor: AppColors.surface,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 84,
-              height: 84,
+              width: 64,
+              height: 64,
               decoration: BoxDecoration(
-                color: AppColors.surface,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.secondary.withValues(alpha: 0.4),
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primaryAction.withValues(alpha: 0.1),
-                    blurRadius: 16,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                color: AppColors.primaryBackground,
+                borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(
                 Icons.school_rounded,
-                size: 44,
+                size: 34,
                 color: AppColors.primaryAction,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             const Text(
-              'Hệ Thống Hỗ Trợ Đồ Án',
+              'HỆ THỐNG HỖ TRỢ ĐỒ ÁN TỐT NGHIỆP CHO SINH VIÊN',
+              textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.2,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -160,16 +151,16 @@ class SplashLoadingView extends StatelessWidget {
             const Text(
               'Đang kiểm tra phiên đăng nhập...',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 13,
                 color: AppColors.textSecondary,
               ),
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 24),
             const SizedBox(
-              width: 26,
-              height: 26,
+              width: 24,
+              height: 24,
               child: CircularProgressIndicator(
-                strokeWidth: 2.5,
+                strokeWidth: 2,
                 color: AppColors.primaryAction,
               ),
             ),

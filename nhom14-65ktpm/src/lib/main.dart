@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Hệ Thống Hỗ Trợ Đồ Án - Nhóm 14',
+      title: 'Hệ thống hỗ trợ đồ án cho sinh viên',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       home: const AuthGate(),
