@@ -1,25 +1,41 @@
 -- ==============================================================================
--- Migration: Thiết lập bảng profiles và bảo mật RLS nền tảng
+-- Migration: Thiết lập bảng profiles và bảo mật RLS nền tảng (Đủ 10 thuộc tính)
 -- Dự án: Hệ Thống Hỗ Trợ Định Hướng Và Chuẩn Bị Đồ Án Tốt Nghiệp Cho Sinh Viên
 -- Tác giả: TV1 – Đào Hà Thu (Nhóm 14 - 65KTPM)
 -- ==============================================================================
 
--- 1. Tạo bảng public.profiles liên kết trực tiếp với auth.users
+-- 1. Tạo bảng public.profiles liên kết trực tiếp với auth.users gồm đủ 10 thuộc tính chuẩn
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  full_name TEXT NOT NULL DEFAULT '',
-  avatar_url TEXT,
+  full_name TEXT,
+  avatar_url TEXT DEFAULT NULL,
   role TEXT NOT NULL DEFAULT 'student' CONSTRAINT check_profiles_role CHECK (role IN ('student', 'lecturer', 'admin')),
+  student_code TEXT DEFAULT NULL,
+  class_name TEXT DEFAULT NULL,
+  major TEXT DEFAULT NULL,
+  skills TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Ghi chú chú thích cho bảng và các cột
+-- Cập nhật an toàn nếu bảng đã được tạo trước đó trên Supabase
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS student_code TEXT DEFAULT NULL;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS class_name TEXT DEFAULT NULL;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS major TEXT DEFAULT NULL;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS skills TEXT[] DEFAULT '{}';
+ALTER TABLE public.profiles ALTER COLUMN full_name DROP NOT NULL;
+ALTER TABLE public.profiles ALTER COLUMN full_name DROP DEFAULT;
+
+-- Ghi chú chú thích chi tiết cho bảng và 10 cột dữ liệu
 COMMENT ON TABLE public.profiles IS 'Hồ sơ người dùng đồng bộ từ auth.users';
-COMMENT ON COLUMN public.profiles.id IS 'Định danh người dùng, khóa ngoại tham chiếu auth.users.id';
+COMMENT ON COLUMN public.profiles.id IS 'Mã định danh người dùng, khóa ngoại tham chiếu auth.users(id)';
 COMMENT ON COLUMN public.profiles.full_name IS 'Họ và tên người dùng';
-COMMENT ON COLUMN public.profiles.avatar_url IS 'Đường dẫn ảnh đại diện (có thể null)';
-COMMENT ON COLUMN public.profiles.role IS 'Phân quyền người dùng: student (mặc định), lecturer, admin';
+COMMENT ON COLUMN public.profiles.avatar_url IS 'Đường dẫn ảnh đại diện';
+COMMENT ON COLUMN public.profiles.role IS 'Vai trò: student (mặc định), lecturer hoặc admin';
+COMMENT ON COLUMN public.profiles.student_code IS 'Mã sinh viên';
+COMMENT ON COLUMN public.profiles.class_name IS 'Lớp sinh hoạt';
+COMMENT ON COLUMN public.profiles.major IS 'Chuyên ngành';
+COMMENT ON COLUMN public.profiles.skills IS 'Danh sách kỹ năng của người dùng';
 COMMENT ON COLUMN public.profiles.created_at IS 'Thời điểm tạo hồ sơ';
 COMMENT ON COLUMN public.profiles.updated_at IS 'Thời điểm cập nhật hồ sơ gần nhất';
 
@@ -61,12 +77,27 @@ AS $$
 BEGIN
   -- Khi tài khoản được tạo trong auth.users, tự động tạo 1 bản ghi profile tương ứng
   -- Mặc định role luôn là 'student', không cho phép tự đăng ký với quyền admin hoặc lecturer
-  INSERT INTO public.profiles (id, full_name, avatar_url, role, created_at, updated_at)
+  INSERT INTO public.profiles (
+    id,
+    full_name,
+    avatar_url,
+    role,
+    student_code,
+    class_name,
+    major,
+    skills,
+    created_at,
+    updated_at
+  )
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
+    NEW.raw_user_meta_data->>'full_name',
     NEW.raw_user_meta_data->>'avatar_url',
     'student',
+    NEW.raw_user_meta_data->>'student_code',
+    NEW.raw_user_meta_data->>'class_name',
+    NEW.raw_user_meta_data->>'major',
+    '{}'::TEXT[],
     now(),
     now()
   );

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/supabase_config.dart';
 import 'core/theme/app_theme.dart';
-import 'screens/login_screen.dart';
+import 'screens/auth_gate.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       title: 'Hệ Thống Hỗ Trợ Đồ Án - Nhóm 14',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const LoginScreen(),
+      home: const AuthGate(),
     );
   }
 }
@@ -125,11 +125,11 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
 
-      // Chuyển về màn hình đăng nhập và xóa toàn bộ ngăn xếp điều hướng
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-        (route) => false,
-      );
+      // Đăng xuất thành công. AuthGate lắng nghe onAuthStateChange
+      // sẽ tự động cập nhật giao diện sang LoginScreen.
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

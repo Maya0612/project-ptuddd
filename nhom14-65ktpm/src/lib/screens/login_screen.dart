@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/supabase_config.dart';
 import '../core/theme/app_theme.dart';
-import '../main.dart';
 import 'register_screen.dart';
 
 /// Màn hình đăng nhập sử dụng Email và Password với Supabase Auth.
@@ -119,14 +118,11 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
 
-        // Điều hướng vào màn hình chính hiện có và thay thế màn hình đăng nhập
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => const MyHomePage(
-              title: 'Hệ Thống Hỗ Trợ Đồ Án - Nhóm 14',
-            ),
-          ),
-        );
+        // Đăng nhập thành công. AuthGate lắng nghe onAuthStateChange
+        // sẽ tự động cập nhật giao diện sang MyHomePage.
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
       }
     } on AuthException catch (e) {
       if (!mounted) return;
