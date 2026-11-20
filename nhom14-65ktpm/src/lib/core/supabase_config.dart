@@ -95,6 +95,14 @@ class SupabaseConfig {
               'Đã kết nối thành công tới máy chủ Supabase! Bảng "profiles" chưa được tạo trên CSDL (hãy chạy file migration SQL trên Supabase Dashboard).',
         };
       }
+      // Mã 42501: permission denied - bảng profiles đã tồn tại và RLS đang chặn truy cập trái phép của người dùng chưa đăng nhập
+      if (e.code == '42501') {
+        return {
+          'connected': true,
+          'message':
+              'Đã kết nối máy chủ Supabase thành công! Bảng profiles và bảo mật RLS đang hoạt động chuẩn xác.',
+        };
+      }
       return {
         'connected': false,
         'error_code': e.code,
