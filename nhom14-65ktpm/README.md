@@ -256,3 +256,4 @@ Yêu cầu: đã cài Flutter SDK, Android Studio hoặc thiết bị/giả lậ
 ---
 
 **Lưu ý:** README này mô tả định hướng hiện tại của nhóm. Khi nhóm thống nhất schema, kiến trúc hoặc phạm vi chính thức, TV1 cập nhật tài liệu và thông báo cho các thành viên.
+Lưu ý Xây dựng chức năng thêm, xem, sửa và xóa thông tin đồ án theo quyền được cấp.
