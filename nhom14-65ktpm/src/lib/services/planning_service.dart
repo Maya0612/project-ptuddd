@@ -44,7 +44,7 @@ class PlanningService {
       'Load plans',
       () => _client
           .from('plans')
-          .select()
+          .select('*, tasks(*)')
           .eq('personal_topic_id', personalTopicId)
           .eq('user_id', userId),
     );
