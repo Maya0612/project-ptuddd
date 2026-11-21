@@ -1,5 +1,5 @@
 # Nhóm 14 – 65KTPM
-## Hệ thống hỗ trợ định hướng và chuẩn bị đồ án tốt nghiệp cho sinh viên
+## TÊN ĐỀ TÀI: Hệ thống hỗ trợ định hướng và chuẩn bị đồ án tốt nghiệp cho sinh viên
 
 > Tài liệu tổng quan dành cho thành viên Nhóm 14 khi tham gia phát triển bài tập học phần **Phát triển Ứng dụng Di động (PTUDDD)**.
 
