@@ -130,7 +130,6 @@ Các bảng dưới đây là **danh sách định hướng**, chưa phải sche
 | `personal_topics` | Đề tài cá nhân của sinh viên | TV4 |
 | `plans` | Kế hoạch chuẩn bị gắn với đề tài cá nhân | TV5 |
 | `tasks` | Công việc thuộc một kế hoạch | TV5 |
-| `ai_suggestions` | Chỉ tạo nếu nhóm thống nhất cần lưu lịch sử gợi ý AI | TV3 phối hợp TV1 |
 
 `auth.users` là bảng do Supabase Auth quản lý, không phải bảng nghiệp vụ do nhóm tự tạo.
 
