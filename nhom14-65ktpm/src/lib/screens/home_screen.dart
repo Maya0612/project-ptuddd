@@ -288,7 +288,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(width: 12),
                   const Expanded(
                     child: Text(
-                      'HỖ TRỢ ĐỒ ÁN',
+                      'TLU - ĐỒ ÁN TỐT NGHIỆP',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
