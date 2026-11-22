@@ -12,8 +12,8 @@
 | :---: | --------- | :----------: | :-----------: | ------- | ------------------- | :----------: | ----- |
 | 1 | Đào Hà Thu | 2351170623 | 65KTPM | Trưởng nhóm | Kiến trúc tổng thể, thiết lập Flutter & Supabase, Supabase Auth, bảng `profiles`, RLS nền tảng, thống nhất CSDL, cấu trúc UI chung & tích hợp | 100% | 2351170623@e.tlu.edu.vn |
 | 2 | Phạm Kim Anh | 2351170572 | 65KTPM | Thành viên | Kho đồ án (`projects`, `fields`, `favorites`), tìm kiếm/lọc/chi tiết, yêu thích, đề xuất bổ sung đồ án & cơ chế Admin/GV duyệt đề xuất | 100% | 2351170572@e.tlu.edu.vn |
-| 3 | Trần Đức Trung | 2251162191 | 64... | Thành viên | AI gợi ý (3–5 đề tài) & đối chiếu kho đồ án đã duyệt qua backend/Edge Function, thiết kế I/O AI, xử lý lỗi API & dữ liệu không hợp lệ | 100% | 2251162191@e.tlu.edu.vn |
-| 4 | Trịnh Mạnh Đức | 2251243284 | 64... | Thành viên | Quản lý đề tài cá nhân (`personal_topics`), CRUD đề tài từ ý tưởng cá nhân/gợi ý AI, quản lý trạng thái, phân quyền theo tài khoản sinh viên | 100% | 2251243284@e.tlu.edu.vn |
+| 3 | Trần Đức Trung | 2251162191 | 64HTTT1 | Thành viên | AI gợi ý (3–5 đề tài) & đối chiếu kho đồ án đã duyệt qua backend/Edge Function, thiết kế I/O AI, xử lý lỗi API & dữ liệu không hợp lệ | 100% | 2251162191@e.tlu.edu.vn |
+| 4 | Trịnh Mạnh Đức | 2251243284 | 64ĐTVT3 | Thành viên | Quản lý đề tài cá nhân (`personal_topics`), CRUD đề tài từ ý tưởng cá nhân/gợi ý AI, quản lý trạng thái, phân quyền theo tài khoản sinh viên | 100% | 2251243284@e.tlu.edu.vn |
 | 5 | Vương Tiến Dũng | 2351170586 | 65KTPM | Thành viên | Lập kế hoạch & theo dõi tiến độ (`plans`, `tasks`), quản lý đầu việc/thời hạn/trạng thái, hiển thị tiến độ & liên kết đề tài cá nhân | 100% | 2351170586@e.tlu.edu.vn |
 
 ## Phân Công Chi Tiết Và Quy Ước Branch Cá Nhân
