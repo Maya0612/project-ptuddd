@@ -12,11 +12,11 @@ Tài liệu này là **bộ hướng dẫn thống nhất duy nhất** áp dụn
 
 ```text
 nhom14-65ktpm  (Nhánh tích hợp chung của nhóm — Base branch cho mọi PR nội bộ)
-   ├── feature/tv1-foundation-auth       (TV1 – Đào Hà Thu)
-   ├── feature/tv2-project-repository    (TV2 – Phạm Kim Anh)
-   ├── feature/tv3-ai-suggestions        (TV3 – Trần Đức Trung)
-   ├── feature/tv4-personal-topics       (TV4 – Trịnh Mạnh Đức)
-   └── feature/tv5-planning-progress     (TV5 – Vương Tiến Dũng)
+   ├── feature/nhom14/foundation-auth       (TV1 – Đào Hà Thu)
+   ├── feature/nhom14/project-repository    (TV2 – Phạm Kim Anh)
+   ├── feature/nhom14/ai-suggestions        (TV3 – Trần Đức Trung)
+   ├── feature/nhom14/personal-topics       (TV4 – Trịnh Mạnh Đức)
+   └── feature/nhom14/planning-progress     (TV5 – Vương Tiến Dũng)
 ```
 
 ---
@@ -27,11 +27,11 @@ Mỗi thành viên sử dụng **duy nhất 01 branch cá nhân cố định** �
 
 | Thành Viên | Mã TV | Branch Cá Nhân Cố Định | Module Phụ Trách |
 | --- | :---: | --- | --- |
-| Đào Hà Thu (Trưởng nhóm) | TV1 | `feature/tv1-foundation-auth` | Kiến trúc, Flutter & Supabase, Auth, `profiles`, RLS nền tảng, tích hợp |
-| Phạm Kim Anh | TV2 | `feature/tv2-project-repository` | Kho đồ án (`projects`, `fields`, `favorites`), tìm kiếm/lọc, yêu thích, đề xuất & duyệt |
-| Trần Đức Trung | TV3 | `feature/tv3-ai-suggestions` | AI gợi ý (3–5 đề tài) & đối chiếu kho đã duyệt qua backend/Edge Function |
-| Trịnh Mạnh Đức | TV4 | `feature/tv4-personal-topics` | Quản lý đề tài cá nhân (`personal_topics`), CRUD, lưu từ ý tưởng/AI, phân quyền |
-| Vương Tiến Dũng | TV5 | `feature/tv5-planning-progress` | Lập kế hoạch & theo dõi tiến độ (`plans`, `tasks`), liên kết đề tài cá nhân |
+| Đào Hà Thu (Trưởng nhóm) | TV1 | `feature/nhom14/foundation-auth` | Kiến trúc, Flutter & Supabase, Auth, `profiles`, RLS nền tảng, tích hợp |
+| Phạm Kim Anh | TV2 | `feature/nhom14/project-repository` | Kho đồ án (`projects`, `fields`, `favorites`), tìm kiếm/lọc, yêu thích, đề xuất & duyệt |
+| Trần Đức Trung | TV3 | `feature/nhom14/ai-suggestions` | AI gợi ý (3–5 đề tài) & đối chiếu kho đã duyệt qua backend/Edge Function |
+| Trịnh Mạnh Đức | TV4 | `feature/nhom14/personal-topics` | Quản lý đề tài cá nhân (`personal_topics`), CRUD, lưu từ ý tưởng/AI, phân quyền |
+| Vương Tiến Dũng | TV5 | `feature/nhom14/planning-progress` | Lập kế hoạch & theo dõi tiến độ (`plans`, `tasks`), liên kết đề tài cá nhân |
 
 ### Quy định bắt buộc về Branch
 - Mỗi thành viên **chỉ làm việc trên branch được chỉ định** của mình.
@@ -87,14 +87,14 @@ Nếu branch cá nhân **đã có** trên máy:
 
 ```bash
 # Ví dụ cho TV2 (thay bằng đúng tên branch của bạn tại Mục 2)
-git checkout feature/tv2-project-repository
+git checkout feature/nhom14/project-repository
 ```
 
 Nếu branch cá nhân **đã có trên GitHub nhưng chưa có trên máy**:
 
 ```bash
 git fetch origin
-git checkout --track origin/feature/tv2-project-repository
+git checkout --track origin/feature/nhom14/project-repository
 ```
 
 Nếu branch cá nhân **chưa tồn tại trên cả máy và GitHub**, tạo mới từ nhánh tích hợp `nhom14-65ktpm`:
@@ -102,8 +102,8 @@ Nếu branch cá nhân **chưa tồn tại trên cả máy và GitHub**, tạo m
 ```bash
 git checkout nhom14-65ktpm
 git pull origin nhom14-65ktpm
-git checkout -b feature/tv2-project-repository
-git push -u origin feature/tv2-project-repository
+git checkout -b feature/nhom14/project-repository
+git push -u origin feature/nhom14/project-repository
 ```
 
 *Giải thích lệnh:*
@@ -159,7 +159,7 @@ Khi hoàn thành một phần công việc hoặc một chức năng trọn vẹ
 2. Kiểm tra kỹ thông tin nhánh:
    - **Base repository:** `Maya0612/project-ptuddd`
    - **Base branch:** `nhom14-65ktpm` *(⚠️ Không chọn `main`)*
-   - **Compare branch:** Branch cá nhân của bạn (VD: `feature/tv2-project-repository`).
+   - **Compare branch:** Branch cá nhân của bạn (VD: `feature/nhom14/project-repository`).
 3. Điền đầy đủ nội dung mô tả PR theo mẫu sau:
 
 ```markdown
@@ -266,7 +266,7 @@ Trước khi tạo mới hoặc chỉnh sửa bất kỳ bảng nào trên Supab
 3. **Primary Key (PK) và Foreign Key (FK)**.
 4. **Quan hệ giữa các bảng** (1-1, 1-N, N-N).
 5. **Ràng buộc dữ liệu** (`NOT NULL`, `UNIQUE`, `CHECK`, giá trị mặc định, `ON DELETE`).
-6. **Quyền truy cập và chính sách RLS (Row Level Security)** theo từng vai trò (Sinh viên, Admin/Giảng viên).
+6. **Quyền truy cập và chính sách RLS (Row Level Security)** theo từng vai trò (Sinh viên, Admin).
 7. **Các thao tác CRUD** cần hỗ trợ từ phía ứng dụng.
 
 - **TV1** chịu trách nhiệm tổng hợp và kiểm tra tính nhất quán của toàn bộ schema trước khi áp dụng.
