@@ -33,71 +33,83 @@ Mỗi thành viên sử dụng **duy nhất 01 branch cá nhân cố định** �
 | Trịnh Mạnh Đức | TV4 | `feature/nhom14/personal-topics` | Quản lý đề tài cá nhân (`personal_topics`), CRUD, lưu từ ý tưởng/AI, phân quyền |
 | Vương Tiến Dũng | TV5 | `feature/nhom14/planning-progress` | Lập kế hoạch & theo dõi tiến độ (`plans`, `tasks`), liên kết đề tài cá nhân |
 
-### Quy định bắt buộc về Branch
-- Mỗi thành viên **chỉ làm việc trên branch được chỉ định** của mình.
-- **Không** code trực tiếp trên nhánh `main`.
-- **Không** code trực tiếp trên nhánh `nhom14-65ktpm`.
-- **Không** tự ý đổi tên branch.
-- **Không** sử dụng chung một branch cá nhân cho nhiều thành viên.
-- Mỗi thành viên **tự commit và push bằng tài khoản GitHub cá nhân của mình**.
-- Tất cả branch cá nhân đều phải được tạo từ nhánh `nhom14-65ktpm`.
-- Mọi Pull Request của thành viên phải đặt **Base branch là `nhom14-65ktpm`** (tuyệt đối không tạo PR trực tiếp từ branch cá nhân vào `main`).
+### Quy định branch
 
----
+- Chỉ làm việc trên branch được phân công.
+- Không commit trực tiếp lên `main` hoặc `nhom14-65ktpm`.
+- Không tự ý đổi tên branch, dùng chung branch hoặc xóa branch cá nhân cố định sau khi merge.
+- Mỗi người commit/push bằng tài khoản GitHub cá nhân.
+- Mọi PR nội bộ phải có base repository `Maya0612/project-ptuddd` và base branch `nhom14-65ktpm`.
+- Branch cá nhân là branch dài hạn. Sau mỗi lần PR được merge, phải đồng bộ lại branch cá nhân từ nhánh tích hợp trước khi tiếp tục công việc.
 
-## 3. Chuẩn Bị Lần Đầu Trên Máy Cá Nhân
+## 3. Chuẩn bị Git lần đầu
 
-Thực hiện **một lần duy nhất** sau khi đã chấp nhận lời mời Collaborator vào repository `Maya0612/project-ptuddd`:
+Thực hiện một lần trên máy cá nhân. Thay thông tin mẫu bằng tên và email gắn với tài khoản GitHub của chính bạn.
 
 ```bash
-# 1. Cấu hình danh tính Git (email phải trùng với email đăng ký tài khoản GitHub)
-git config --global user.name "Họ và Tên Của Bạn"
-git config --global user.email "email_github_cua_ban@example.com"
+git config --global user.name "Ho Va Ten"
+git config --global user.email "email-github@example.com"
 
-# 2. Tải repository của nhóm về máy
 git clone https://github.com/Maya0612/project-ptuddd.git
 cd project-ptuddd
-
-# 3. Chuyển sang nhánh tích hợp chung của nhóm
-git checkout --track origin/nhom14-65ktpm
 ```
 
----
+Kiểm tra remote:
 
-## 4. Quy Trình Git/GitHub 7 Bước Bắt Buộc
+```bash
+git remote -v
+```
 
-### Bước 1: Đồng bộ nhánh tích hợp (`nhom14-65ktpm`)
+`origin` phải trỏ tới `https://github.com/Maya0612/project-ptuddd.git`.
 
-Trước khi bắt đầu phiên làm việc hoặc lấy các cập nhật mới nhất mà nhóm đã Merge:
+Nếu chưa có nhánh tích hợp trên máy, lấy branch từ GitHub:
 
 ```bash
 git fetch origin
-git checkout nhom14-65ktpm
-git pull origin nhom14-65ktpm
+git switch --track origin/nhom14-65ktpm
 ```
 
-*Giải thích lệnh:*
-- `git fetch origin`: Lấy thông tin nhánh và commit mới nhất từ GitHub về máy (chưa tự động gộp vào code đang sửa).
-- `git checkout nhom14-65ktpm`: Chuyển sang nhánh tích hợp chung của nhóm.
-- `git pull origin nhom14-65ktpm`: Cập nhật nhánh `nhom14-65ktpm` trên máy khớp hoàn toàn với phiên bản mới nhất trên GitHub.
+Nếu Git báo branch đã tồn tại ở local thì không chạy lại lệnh tạo tracking; chỉ chuyển branch:
 
-### Bước 2: Chuyển sang branch cá nhân
+```bash
+git switch nhom14-65ktpm
+```
 
-Nếu branch cá nhân **đã có** trên máy:
+Sau đó lấy cập nhật mới nhất:
+
+```bash
+git pull --ff-only origin nhom14-65ktpm
+```
+
+## 4. Quy trình làm việc hằng ngày
+
+### Bước 1 – Cập nhật nhánh tích hợp
+
+Trước khi bắt đầu một phiên làm việc:
+
+```bash
+git fetch origin
+git switch nhom14-65ktpm
+git pull --ff-only origin nhom14-65ktpm
+```
+
+### Bước 2 – Chuyển sang branch cá nhân
+
+Ví dụ TV2:
 
 ```bash
 # Ví dụ cho TV2 (thay bằng đúng tên branch của bạn tại Mục 2)
 git checkout feature/nhom14/project-repository
 ```
 
-Nếu branch cá nhân **đã có trên GitHub nhưng chưa có trên máy**:
+Nếu branch cá nhân đã có trên GitHub nhưng chưa có ở máy:
 
 ```bash
 git fetch origin
 git checkout --track origin/feature/nhom14/project-repository
 ```
 
-Nếu branch cá nhân **chưa tồn tại trên cả máy và GitHub**, tạo mới từ nhánh tích hợp `nhom14-65ktpm`:
+Nếu branch cá nhân chưa tồn tại ở cả local và GitHub, tạo từ nhánh tích hợp mới nhất. Ví dụ TV2:
 
 ```bash
 git checkout nhom14-65ktpm
@@ -106,114 +118,108 @@ git checkout -b feature/nhom14/project-repository
 git push -u origin feature/nhom14/project-repository
 ```
 
-*Giải thích lệnh:*
-- `git checkout -b <ten-branch>`: Tạo một branch mới tại vị trí hiện tại (`nhom14-65ktpm`) và chuyển sang làm việc trên branch đó.
-- `git push -u origin <ten-branch>`: Đẩy branch vừa tạo lên GitHub và thiết lập liên kết theo dõi (`-u` / upstream) để các lần sau đẩy code nhanh hơn.
+Mỗi thành viên thay tên branch trong ví dụ bằng branch đã được chỉ định ở Mục 2.
 
-### Bước 3: Code và Commit
+### Bước 3 – Code, kiểm tra và commit
 
-**Phạm vi thay đổi:** Chỉ chỉnh sửa các file thuộc phạm vi module được giao và **nằm hoàn toàn trong thư mục `nhom14-65ktpm/`**. Không sửa `README.md` hoặc `.gitignore` ở thư mục gốc của kho lưu trữ.
-
-Trước khi commit, luôn kiểm tra những file vừa thay đổi:
+Trước khi commit:
 
 ```bash
 git status
 ```
 
-Sau khi kiểm tra thấy **chỉ có các file hợp lệ trong `nhom14-65ktpm/`**, tiến hành đưa vào staging, commit và push:
+Kiểm tra:
+- Đang đứng trên đúng branch cá nhân.
+- Chỉ có file liên quan đến Issue/module được giao.
+- Không có `.env`, khóa bí mật, file build hoặc file cá nhân.
+- Không vô tình sửa tài liệu gốc do giảng viên quản lý.
+
+Từ thư mục gốc repository, stage đúng phạm vi. Ví dụ nếu làm trong thư mục nhóm:
 
 ```bash
-# Đưa toàn bộ thay đổi đã kiểm tra vào staging
-git add .
-# (Khuyến nghị an toàn theo quy định học phần khi đứng ở thư mục gốc project-ptuddd:
-#  dùng `git add nhom14-65ktpm/` để chắc chắn không đưa nhầm file ngoài thư mục nhóm)
-
-# Tạo commit với mô tả cụ thể
-git commit -m "feat: implement project search and filter screen"
-
-# Đẩy commit lên branch cá nhân của bạn trên GitHub
-git push origin <ten-branch-ca-nhan>
+git add nhom14-65ktpm/
+git status
+git commit -m "feat: add project search and filter"
+git push origin feature/tv2-project-repository
 ```
 
-*Giải thích từng lệnh:*
-- `git status`: Hiển thị nhánh đang đứng và danh sách file đã sửa/tạo mới/xóa để kiểm tra trước khi đóng gói.
-- `git add .` (hoặc `git add nhom14-65ktpm/`): Đưa các file thay đổi vào khu vực chuẩn bị lưu (Staging Area).
-- `git commit -m "..."`: Lưu lại một mốc thay đổi (snapshot) vào lịch sử Git cục bộ kèm thông điệp mô tả rõ ràng.
-- `git push origin <ten-branch-ca-nhan>`: Gửi các commit mới từ máy bạn lên đúng branch cá nhân trên GitHub.
+Không dùng `git add .` một cách máy móc khi chưa kiểm tra `git status`. Nếu repository có thay đổi ngoài thư mục nhóm, chỉ stage các file thực sự thuộc nhiệm vụ.
 
-#### Quy chuẩn Commit Message
-- **Bắt buộc** nêu rõ loại thay đổi và nội dung cụ thể đã làm.
-- **Tuyệt đối không** dùng các thông điệp chung chung như `update`, `fix`, `done`, `test`, `abc`.
-- Các tiền tố khuyến nghị:
-  - `feat:` Thêm chức năng hoặc màn hình mới (VD: `feat: add favorite toggle for project detail`).
-  - `fix:` Sửa lỗi cụ thể (VD: `fix: handle empty response from AI suggestion API`).
-  - `docs:` Cập nhật tài liệu (VD: `docs: add database schema proposal for plans and tasks`).
-  - `refactor:` Tối ưu cấu trúc code không đổi hành vi (VD: `refactor: extract project card widget`).
-  - `chore:` Cấu hình, dọn dẹp (VD: `chore: add env example for supabase config`).
+#### Quy ước commit message
 
-### Bước 4: Tạo Pull Request (PR)
+Dùng tiền tố và nội dung cụ thể:
 
-Khi hoàn thành một phần công việc hoặc một chức năng trọn vẹn:
+| Prefix | Dùng khi | Ví dụ |
+|---|---|---|
+| `feat:` | Thêm chức năng | `feat: add project search and filter` |
+| `fix:` | Sửa lỗi | `fix: handle empty AI response` |
+| `docs:` | Cập nhật tài liệu | `docs: update database workflow` |
+| `refactor:` | Tái cấu trúc không đổi hành vi | `refactor: extract project card widget` |
+| `test:` | Thêm/sửa kiểm thử | `test: add profile repository tests` |
+| `chore:` | Cấu hình/công việc phụ trợ | `chore: configure supabase cli` |
 
-1. Truy cập `https://github.com/Maya0612/project-ptuddd` → tab **Pull requests** → **New pull request**.
-2. Kiểm tra kỹ thông tin nhánh:
+Không dùng message chung chung như `update`, `done`, `fix bug`, `test` hoặc `abc`.
+
+### Bước 4 – Tạo Pull Request
+
+Khi hoàn thành một phần việc đủ rõ ràng để review:
+
+1. Mở repository `Maya0612/project-ptuddd` → **Pull requests** → **New pull request**.
+2. Chọn đúng:
    - **Base repository:** `Maya0612/project-ptuddd`
    - **Base branch:** `nhom14-65ktpm` *(⚠️ Không chọn `main`)*
    - **Compare branch:** Branch cá nhân của bạn (VD: `feature/nhom14/project-repository`).
 3. Điền đầy đủ nội dung mô tả PR theo mẫu sau:
 
 ```markdown
-## Chức năng đã thực hiện
-- Mô tả ngắn gọn các tính năng/thay đổi chính trong PR này.
+## 1. Nội dung thay đổi
+- Mô tả chức năng hoặc phần sửa đổi.
 
-## Các file quan trọng đã thay đổi
-- `nhom14-65ktpm/src/lib/...`
+## 2. Phạm vi file
+- Liệt kê các file chính đã thay đổi.
 
-## Cách kiểm thử
-1. Bước 1...
-2. Bước 2...
-3. Kết quả mong đợi...
+## 3. Cách kiểm thử
+1. Các bước kiểm thử.
+2. Kết quả mong đợi.
+3. Kết quả thực tế.
 
-## Issue liên quan
+## 4. Issue liên quan
 Refs #<issue_number>
+
+## 5. Lưu ý cho reviewer
+- Các điểm cần chú ý, phụ thuộc hoặc phần chưa hoàn thiện (nếu có).
 ```
 
-4. Gắn **Reviewers** (TV1 hoặc thành viên được phân công review) ở cột bên phải rồi bấm **Create pull request**.
-5. Chuyển thẻ Issue tương ứng trên Project Board sang cột **In Review**.
+### Bước 5 – Review Pull Request
 
-> **Lưu ý:** Không tạo Pull Request trực tiếp từ branch cá nhân vào `main`.
+- Người tạo PR không tự approve PR của chính mình.
+- Tối thiểu một thành viên khác phải review. Nếu repository có branch protection/ruleset yêu cầu approval, phải đáp ứng đúng điều kiện đó; reviewer cần có quyền phù hợp trên repository.
+- Reviewer kiểm tra nghiệp vụ, chất lượng code, khả năng chạy, xử lý lỗi, phạm vi thay đổi, bảo mật và tương thích với module/schema khác.
+- Nếu có yêu cầu chỉnh sửa, tác giả sửa ngay trên branch cá nhân đang mở PR, sau đó commit và push lại. PR tự cập nhật.
+- Chỉ approve khi thay đổi đã được kiểm tra. Không approve hình thức.
 
-### Bước 5: Review Pull Request
+### Bước 6 – Merge và cập nhật Issue/Project Board
 
-- Người tạo PR **không được tự Approve** PR của chính mình.
-- PR bắt buộc phải được **ít nhất 01 thành viên khác có quyền phù hợp** (như Trưởng nhóm TV1 hoặc Reviewer được chỉ định) kiểm tra.
-- **Nội dung Reviewer cần kiểm tra:**
-  - Logic xử lý và luồng nghiệp vụ có đúng yêu cầu không.
-  - Cấu trúc thư mục, đặt tên file/biến, tính dễ đọc.
-  - Lỗi biên dịch, lỗi runtime, xử lý trường hợp dữ liệu rỗng/lỗi mạng.
-  - Khả năng tương thích với các module khác và schema CSDL chung.
-  - Phạm vi thay đổi: có sửa ngoài module được giao hoặc dính file rác (`.env`, build artifacts, file IDE) không.
-- **Nếu Reviewer yêu cầu chỉnh sửa (*Request changes*):**
-  1. Người tạo PR chỉnh sửa tiếp **ngay trên chính branch cá nhân đó**.
-  2. Commit và `git push origin <ten-branch-ca-nhan>` — PR sẽ tự động cập nhật.
-  3. Phản hồi lại comment của Reviewer và yêu cầu review lại.
-- PR chỉ được phép Merge sau khi đã được **Approve** theo quy định của repository.
+Chỉ merge khi:
+- Đã có approval theo yêu cầu repository.
+- Không còn conflict chưa xử lý.
+- Các kiểm tra cần thiết đã đạt.
+- Nội dung PR đúng Issue và phạm vi được giao.
 
-### Bước 6: Merge Pull Request
+Sau khi merge vào `nhom14-65ktpm`:
+- Không xóa branch cá nhân cố định.
+- Cập nhật Issue và Project Board sang `Done` sau khi xác nhận công việc thực sự hoàn tất.
+- Không chuyển sang `Done` chỉ vì đã push code hoặc mới mở PR.
 
-- Chỉ Merge PR vào `nhom14-65ktpm` sau khi đã được chấp thuận (Approve) và **không còn lỗi hay xung đột (conflict)** chưa giải quyết.
-- **QUAN TRỌNG — KHÔNG XÓA BRANCH CÁ NHÂN SAU KHI MERGE:**
-  - Nhóm sử dụng 5 branch cá nhân cố định theo từng thành viên.
-  - Sau khi bấm Merge PR, **không bấm nút "Delete branch"** cho 5 nhánh `feature/tv1-...` đến `feature/tv5-...`.
-- Sau khi Merge hoàn tất và xác nhận công việc đạt yêu cầu, cập nhật trạng thái Issue và chuyển thẻ trên Project Board sang **Done**.
+Dùng `Refs #<issue_number>` trong PR để liên kết Issue. Không mặc định dùng `Closes #...` vì PR merge vào branch không phải default branch có thể không tự đóng Issue theo cấu hình GitHub. Nếu Issue chưa tự đóng, người phụ trách đóng thủ công sau khi xác nhận.
 
-### Bước 7: Đồng bộ branch cá nhân sau khi nhóm đã Merge thay đổi mới
+### Bước 7 – Đồng bộ branch cá nhân sau khi có merge mới
 
-Mỗi khi nhánh `nhom14-65ktpm` có PR mới được Merge, trước khi tiếp tục code, mọi thành viên cần cập nhật branch cá nhân của mình theo nhánh tích hợp:
+Sau khi nhánh tích hợp có thay đổi mới, mỗi thành viên cập nhật branch của mình:
 
 ```bash
 git fetch origin
-git checkout feature/<branch-cua-minh>
+git switch feature/tv2-project-repository
 git merge origin/nhom14-65ktpm
 git push origin feature/<branch-cua-minh>
 ```
