@@ -33,27 +33,111 @@
 ## Hướng Dẫn Thiết Lập Môi Trường Và Khởi Chạy Ứng Dụng
 
 ### 1. Yêu cầu môi trường
-- Flutter SDK (khuyến nghị bản ổn định mới nhất, tương thích Dart SDK theo `src/pubspec.yaml`).
-- Android Studio hoặc VS Code (đã cài đặt extension **Flutter** và **Dart**).
-- Thiết bị giả lập Android (AVD) hoặc thiết bị thật đã bật **USB Debugging** (hoặc trình duyệt Chrome/Windows desktop để kiểm thử nhanh).
-- Tài khoản Git đã cấu hình trùng với tài khoản GitHub cá nhân (xem [`docs/GIT_WORKFLOW.md`](./docs/GIT_WORKFLOW.md)).
+- **Flutter SDK:** Phiên bản 3.24 trở lên (khuyến nghị Flutter 3.47+ tương thích Dart SDK `^3.13.5` theo `src/pubspec.yaml`). Kiểm tra bằng `flutter --version`.
+- **IDE:** Android Studio hoặc VS Code (đã cài đặt tiện ích mở rộng **Flutter** và **Dart**).
+- **Môi trường chạy/kiểm thử:**
+  - Thiết bị Android thật (đã bật USB Debugging) hoặc máy ảo Android Emulator (AVD).
+  - Hoặc Windows Desktop (đã cài *Desktop development with C++* qua Visual Studio Build Tools).
+- **Git:** Đã cấu hình danh tính trùng khớp GitHub cá nhân (`git config --global user.name` và `git config --global user.email`).
 
-### 2. Các bước cài đặt và khởi chạy
-1. Mở Terminal và chuyển vào thư mục chứa mã nguồn của nhóm:
+---
+
+### 2. Các bước thiết lập và khởi chạy ứng dụng
+
+#### Bước 1: Di chuyển vào thư mục mã nguồn
+Mở Terminal/Command Prompt tại thư mục gốc repository và di chuyển vào `nhom14-65ktpm/src`:
+```bash
+cd nhom14-65ktpm/src
+```
+
+#### Bước 2: Cài đặt các gói phụ thuộc (Dependencies)
+```bash
+flutter pub get
+```
+
+#### Bước 3: Cấu hình biến môi trường kết nối Supabase (`env.json`)
+Ứng dụng sử dụng cơ chế nạp biến môi trường an toàn tại thời điểm biên dịch qua cờ `--dart-define-from-file=env.json`:
+1. Trong thư mục `nhom14-65ktpm/src/`, tạo một tệp mới tên là `env.json` dựa theo mẫu `env.json.example`:
    ```bash
-   cd nhom14-65ktpm/src
+   # Windows PowerShell:
+   Copy-Item env.json.example env.json
+
+   # Linux / macOS / Git Bash:
+   cp env.json.example env.json
    ```
-2. Cài đặt các gói phụ thuộc (dependencies):
+2. Mở file `env.json` vừa tạo và điền thông tin dự án Supabase dùng chung của nhóm (lấy từ Trưởng nhóm TV1, **tuyệt đối không chia sẻ công khai**):
+   ```json
+   {
+     "SUPABASE_URL": "https://<your-project-id>.supabase.co",
+     "SUPABASE_ANON_KEY": "<your-publishable-or-anon-key>"
+   }
+   ```
+   > ⚠️ **Quy tắc bảo mật bắt buộc:** Tệp `env.json` đã được đưa vào `.gitignore`. Tuyệt đối **KHÔNG** commit `env.json`, API key bí mật (`service_role`), mật khẩu Database lên Git.
+
+#### Bước 4: Kiểm tra thiết bị sẵn sàng
+```bash
+flutter devices
+```
+
+#### Bước 5: Khởi chạy ứng dụng
+Chạy ứng dụng kèm cờ nạp cấu hình `env.json`:
+```bash
+# Khởi chạy mặc định (chọn thiết bị đang kết nối):
+flutter run --dart-define-from-file=env.json
+
+# Hoặc khởi chạy trên Windows Desktop:
+flutter run -d windows --dart-define-from-file=env.json
+```
+
+#### Bước 6: Chạy kiểm thử tự động (Unit & Widget Tests)
+Trước khi tạo commit hoặc mở Pull Request, chạy kiểm thử để đảm bảo không làm gãy mã nguồn nền tảng:
+```bash
+flutter test --dart-define-from-file=env.json
+```
+
+---
+
+### 3. Quy trình làm việc với Git cho từng thành viên
+
+1. **Đồng bộ nhánh nhóm trước khi làm việc:**
    ```bash
-   flutter pub get
+   git checkout nhom14-65ktpm
+   git pull origin nhom14-65ktpm
    ```
-3. Cấu hình biến môi trường cục bộ (khi TV1 hoàn tất tích hợp Supabase):
-   - Tạo file `.env` theo mẫu `.env.example` (không commit file `.env`, API Key hay mật khẩu lên GitHub).
-4. Kiểm tra thiết bị đang kết nối:
+2. **Chuyển sang nhánh tính năng cá nhân:**
+   Mỗi thành viên làm việc trên nhánh chuẩn `feature/nhom14/<ten-tinh-nang>`:
    ```bash
-   flutter devices
+   # Nếu nhánh chưa tồn tại ở local:
+   git checkout -b feature/nhom14/<ten-tinh-nang>
+   git push -u origin feature/nhom14/<ten-tinh-nang>
+
+   # Nếu nhánh đã có:
+   git checkout feature/nhom14/<ten-tinh-nang>
+   git merge nhom14-65ktpm
    ```
-5. Khởi chạy ứng dụng:
+3. **Commit đúng quy chuẩn:**
+   Chỉ stage thư mục nhóm:
    ```bash
-   flutter run
+   git status
+   git add nhom14-65ktpm/
+   git commit -m "feat(nhom14): <mô tả công việc đã làm>"
+   git push origin feature/nhom14/<ten-tinh-nang>
    ```
+4. **Mở Pull Request (PR):**
+   - Base branch: `nhom14-65ktpm`
+   - Compare branch: `feature/nhom14/<ten-tinh-nang>`
+   - Nhờ thành viên khác review trước khi merge. Không xóa các nhánh feature cố định.
+
+---
+
+### 4. Xử lý các lỗi thiết lập thường gặp
+
+- **Lỗi: `⚠️ CẢNH BÁO: Chưa tìm thấy SUPABASE_URL hoặc SUPABASE_ANON_KEY`:**
+  - *Nguyên nhân:* Bạn quên truyền cờ `--dart-define-from-file=env.json` khi chạy lệnh `flutter run`.
+  - *Khắc phục:* Đảm bảo file `nhom14-65ktpm/src/env.json` đã được tạo và luôn chạy kèm tham số: `flutter run --dart-define-from-file=env.json`.
+- **Lỗi: `CocoaPods not installed` hoặc thiếu Visual Studio C++ Build Tools:**
+  - *Khắc phục:* Nếu chạy trên Windows Desktop, cần cài đặt Visual Studio Community (tích chọn *Desktop development with C++*). Nếu chạy trên Android, mở Android Studio và chạy máy ảo Android Emulator để thay thế.
+- **Lỗi: `Target of URI doesn't exist` hoặc xung đột package:**
+  - *Khắc phục:* Chạy `flutter clean` rồi chạy lại `flutter pub get`.
+- **Lỗi: Git báo `non-fast-forward` khi push:**
+  - *Khắc phục:* Chạy `git pull --rebase origin feature/nhom14/<ten-tinh-nang>` rồi mới `git push`.
