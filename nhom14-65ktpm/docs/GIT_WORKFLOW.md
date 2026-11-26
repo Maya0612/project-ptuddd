@@ -139,8 +139,8 @@ Từ thư mục gốc repository, stage đúng phạm vi. Ví dụ nếu làm tr
 ```bash
 git add nhom14-65ktpm/
 git status
-git commit -m "feat: add project search and filter"
-git push origin feature/tv2-project-repository
+git commit -m "feat(nhom14): add project search and filter"
+git push origin feature/nhom14/project-repository
 ```
 
 Không dùng `git add .` một cách máy móc khi chưa kiểm tra `git status`. Nếu repository có thay đổi ngoài thư mục nhóm, chỉ stage các file thực sự thuộc nhiệm vụ.
@@ -219,7 +219,7 @@ Sau khi nhánh tích hợp có thay đổi mới, mỗi thành viên cập nhậ
 
 ```bash
 git fetch origin
-git switch feature/tv2-project-repository
+git switch feature/nhom14/project-repository
 git merge origin/nhom14-65ktpm
 git push origin feature/<branch-cua-minh>
 ```

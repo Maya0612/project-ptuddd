@@ -213,25 +213,53 @@ project-ptuddd/
 
 Nếu cấu trúc thực tế trong repository khác sơ đồ này, cần đối chiếu với README gốc của giảng viên trước khi di chuyển hoặc tạo thư mục. Không tự ý thay đổi cấu trúc nộp bài do giảng viên quy định.
 
-## 8. Khởi chạy ứng dụng Flutter
+## 8. Cấu hình môi trường và khởi chạy ứng dụng
 
-Mở terminal tại thư mục nhóm rồi chạy:
+### 8.1. Cài đặt các gói phụ thuộc (Dependencies)
+Mở terminal tại thư mục mã nguồn `nhom14-65ktpm/src`:
 
 ```bash
 cd nhom14-65ktpm/src
 flutter pub get
-flutter run
 ```
 
-Nếu đang ở thư mục `nhom14-65ktpm` thì chỉ cần:
+### 8.2. Cấu hình biến môi trường kết nối Supabase (`env.json`)
+Ứng dụng sử dụng tệp `env.json` tại `nhom14-65ktpm/src/env.json` để truyền thông số kết nối vào ứng dụng qua `--dart-define-from-file`:
+
+1. Sao chép từ tệp mẫu:
+   ```bash
+   # Windows PowerShell:
+   Copy-Item env.json.example env.json
+
+   # Linux / macOS / Git Bash:
+   cp env.json.example env.json
+   ```
+2. Mở file `env.json` vừa tạo và điền thông tin Supabase dự án (do Trưởng nhóm TV1 cung cấp nội bộ):
+   ```json
+   {
+     "SUPABASE_URL": "https://<your-project-id>.supabase.co",
+     "SUPABASE_ANON_KEY": "<your-publishable-or-anon-key>"
+   }
+   ```
+   > ⚠️ **Bảo mật:** Tệp `env.json` đã nằm trong `.gitignore`. Tuyệt đối không commit tệp này hoặc đưa khóa bí mật lên repository.
+
+### 8.3. Khởi chạy ứng dụng
+Chạy ứng dụng kèm cờ nạp `env.json`:
 
 ```bash
-cd src
-flutter pub get
-flutter run
+# Khởi chạy trên thiết bị đang kết nối (Android/Windows/Web):
+flutter run --dart-define-from-file=env.json
+
+# Hoặc chỉ định Windows Desktop:
+flutter run -d windows --dart-define-from-file=env.json
 ```
 
-Yêu cầu: đã cài Flutter SDK, Android Studio hoặc thiết bị/giả lập phù hợp. Phiên bản Flutter/Dart và cấu hình môi trường cụ thể cần được ghi nhận trong `danhsachnhom.md` khi nhóm chốt môi trường dùng chung.
+### 8.4. Kiểm thử tự động
+Trước khi commit, thành viên chạy kiểm thử để đảm bảo tính năng nền tảng hoạt động chuẩn xác:
+
+```bash
+flutter test --dart-define-from-file=env.json
+```
 
 ## 9. Bảo mật
 
