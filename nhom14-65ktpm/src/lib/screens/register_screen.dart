@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../core/supabase_config.dart';
 import '../core/theme/app_theme.dart';
 
 /// Màn hình đăng ký tài khoản sinh viên/người dùng mới.
-/// 
+///
 /// Tuân thủ hệ thống màu chuẩn hóa:
 /// - Primary background: #EBEAFF
 /// - Secondary: #9694FF
@@ -38,31 +39,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   /// Chuyển đổi mã lỗi kỹ thuật từ Supabase thành thông điệp thân thiện với người dùng
-  String _getReadableErrorMessage(dynamic error) {
+  String _getReadableErrorMessage(Object error) {
+    final detail = error is AuthException
+        ? error.message
+        : error is PostgrestException
+        ? error.message
+        : error.toString();
+    debugPrint('[RegisterScreen] Authentication error: $detail');
+
+    String? friendlyMessage;
     if (error is AuthException) {
-      final msg = error.message.toLowerCase();
+      final msg = detail.toLowerCase();
       if (msg.contains('user already registered') ||
           msg.contains('already exists') ||
           msg.contains('unique constraint')) {
-        return 'Email này đã được đăng ký. Vui lòng sử dụng email khác hoặc đăng nhập.';
+        friendlyMessage = 'Email này đã được đăng ký. Vui lòng sử dụng email khác hoặc đăng nhập.';
       } else if (msg.contains('password') && msg.contains('least')) {
-        return 'Mật khẩu phải có ít nhất 6 ký tự.';
+        friendlyMessage = 'Mật khẩu phải có ít nhất 6 ký tự.';
       } else if (msg.contains('too many requests') ||
           msg.contains('rate limit')) {
-        return 'Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau ít phút.';
+        friendlyMessage =
+            'Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau ít phút.';
       }
-      return 'Đăng ký không thành công: ${error.message}';
+    } else {
+      final errStr = detail.toLowerCase();
+      if (errStr.contains('socketexception') ||
+          errStr.contains('network') ||
+          errStr.contains('failed host lookup') ||
+          errStr.contains('clientexception')) {
+        friendlyMessage = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.';
+      }
     }
 
-    final errStr = error.toString().toLowerCase();
-    if (errStr.contains('socketexception') ||
-        errStr.contains('network') ||
-        errStr.contains('failed host lookup') ||
-        errStr.contains('clientexception')) {
-      return 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.';
-    }
-
-    return 'Đã có lỗi xảy ra trong quá trình đăng ký. Vui lòng thử lại sau.';
+    final prefix = friendlyMessage ?? 'Đăng ký không thành công.';
+    return '$prefix\nChi tiết lỗi: $detail';
   }
 
   void _showErrorSnackBar(String message) {
@@ -77,7 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         backgroundColor: AppColors.danger,
         behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 4),
+        duration: const Duration(seconds: 8),
       ),
     );
   }
@@ -105,9 +115,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final response = await supabase.auth.signUp(
         email: email,
         password: password,
-        data: {
-          'full_name': fullName,
-        },
+        data: {'full_name': fullName},
       );
 
       if (!mounted) return;
@@ -123,7 +131,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             backgroundColor: AppColors.surface,
             title: const Row(
               children: [
-                Icon(Icons.mark_email_read_rounded, color: AppColors.primaryAction),
+                Icon(
+                  Icons.mark_email_read_rounded,
+                  color: AppColors.primaryAction,
+                ),
                 SizedBox(width: 10),
                 Text(
                   'Xác thực tài khoản',
@@ -209,7 +220,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 24.0,
+            ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 440),
               child: Container(
@@ -265,208 +279,208 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                        // 1. Trường Họ và tên
-                        TextFormField(
-                          controller: _fullNameController,
-                          enabled: !_isLoading,
-                          keyboardType: TextInputType.name,
-                          textInputAction: TextInputAction.next,
-                          decoration: const InputDecoration(
-                            labelText: 'Họ và tên *',
-                            hintText: 'Nguyễn Văn A',
-                            prefixIcon: Icon(Icons.person_outline_rounded),
-                          ),
-                          validator: (value) {
-                            final trimmed = value?.trim() ?? '';
-                            if (trimmed.isEmpty) {
-                              return 'Vui lòng nhập họ và tên';
-                            }
-                            if (trimmed.length < 2) {
-                              return 'Họ và tên phải có ít nhất 2 ký tự';
-                            }
-                            return null;
-                          },
+                      // 1. Trường Họ và tên
+                      TextFormField(
+                        controller: _fullNameController,
+                        enabled: !_isLoading,
+                        keyboardType: TextInputType.name,
+                        textInputAction: TextInputAction.next,
+                        decoration: const InputDecoration(
+                          labelText: 'Họ và tên *',
+                          hintText: 'Nguyễn Văn A',
+                          prefixIcon: Icon(Icons.person_outline_rounded),
                         ),
-                        const SizedBox(height: 16),
+                        validator: (value) {
+                          final trimmed = value?.trim() ?? '';
+                          if (trimmed.isEmpty) {
+                            return 'Vui lòng nhập họ và tên';
+                          }
+                          if (trimmed.length < 2) {
+                            return 'Họ và tên phải có ít nhất 2 ký tự';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
 
-                        // 2. Trường Email
-                        TextFormField(
-                          controller: _emailController,
-                          enabled: !_isLoading,
-                          keyboardType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.next,
-                          decoration: const InputDecoration(
-                            labelText: 'Email *',
-                            hintText: 'sinhvien@e.tlu.edu.vn',
-                            prefixIcon: Icon(Icons.email_outlined),
-                          ),
-                          validator: (value) {
-                            final trimmed = value?.trim() ?? '';
-                            if (trimmed.isEmpty) {
-                              return 'Vui lòng nhập địa chỉ email';
-                            }
-                            final emailRegex = RegExp(
-                              r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-                            );
-                            if (!emailRegex.hasMatch(trimmed)) {
-                              return 'Email không hợp lệ (ví dụ: sinhvien@e.tlu.edu.vn)';
-                            }
-                            return null;
-                          },
+                      // 2. Trường Email
+                      TextFormField(
+                        controller: _emailController,
+                        enabled: !_isLoading,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        decoration: const InputDecoration(
+                          labelText: 'Email *',
+                          hintText: 'sinhvien@e.tlu.edu.vn',
+                          prefixIcon: Icon(Icons.email_outlined),
                         ),
-                        const SizedBox(height: 16),
+                        validator: (value) {
+                          final trimmed = value?.trim() ?? '';
+                          if (trimmed.isEmpty) {
+                            return 'Vui lòng nhập địa chỉ email';
+                          }
+                          final emailRegex = RegExp(
+                            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                          );
+                          if (!emailRegex.hasMatch(trimmed)) {
+                            return 'Email không hợp lệ (ví dụ: sinhvien@e.tlu.edu.vn)';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
 
-                        // 3. Trường Mật khẩu
-                        TextFormField(
-                          controller: _passwordController,
-                          enabled: !_isLoading,
-                          obscureText: _obscurePassword,
-                          textInputAction: TextInputAction.next,
-                          decoration: InputDecoration(
-                            labelText: 'Mật khẩu *',
-                            hintText: 'Ít nhất 6 ký tự',
-                            prefixIcon: const Icon(Icons.lock_outline),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined,
-                                color: AppColors.secondary,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
-                              tooltip: _obscurePassword
-                                  ? 'Hiển thị mật khẩu'
-                                  : 'Ẩn mật khẩu',
+                      // 3. Trường Mật khẩu
+                      TextFormField(
+                        controller: _passwordController,
+                        enabled: !_isLoading,
+                        obscureText: _obscurePassword,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          labelText: 'Mật khẩu *',
+                          hintText: 'Ít nhất 6 ký tự',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                              color: AppColors.secondary,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                            tooltip: _obscurePassword
+                                ? 'Hiển thị mật khẩu'
+                                : 'Ẩn mật khẩu',
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Vui lòng nhập mật khẩu';
+                          }
+                          if (value.length < 6) {
+                            return 'Mật khẩu phải có ít nhất 6 ký tự';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // 4. Trường Xác nhận mật khẩu
+                      TextFormField(
+                        controller: _confirmPasswordController,
+                        enabled: !_isLoading,
+                        obscureText: _obscureConfirmPassword,
+                        textInputAction: TextInputAction.done,
+                        onFieldSubmitted: (_) => _handleRegister(),
+                        decoration: InputDecoration(
+                          labelText: 'Xác nhận mật khẩu *',
+                          hintText: 'Nhập lại mật khẩu ở trên',
+                          prefixIcon: const Icon(Icons.lock_reset_rounded),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureConfirmPassword
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                              color: AppColors.secondary,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscureConfirmPassword =
+                                    !_obscureConfirmPassword;
+                              });
+                            },
+                            tooltip: _obscureConfirmPassword
+                                ? 'Hiển thị mật khẩu'
+                                : 'Ẩn mật khẩu',
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Vui lòng xác nhận mật khẩu';
+                          }
+                          if (value != _passwordController.text) {
+                            return 'Mật khẩu xác nhận không trùng khớp';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 26),
+
+                      // Nút Đăng ký
+                      SizedBox(
+                        height: 50,
+                        child: FilledButton(
+                          onPressed: _isLoading ? null : _handleRegister,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.primaryAction,
+                            foregroundColor: AppColors.textLight,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Vui lòng nhập mật khẩu';
-                            }
-                            if (value.length < 6) {
-                              return 'Mật khẩu phải có ít nhất 6 ký tự';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-
-                        // 4. Trường Xác nhận mật khẩu
-                        TextFormField(
-                          controller: _confirmPasswordController,
-                          enabled: !_isLoading,
-                          obscureText: _obscureConfirmPassword,
-                          textInputAction: TextInputAction.done,
-                          onFieldSubmitted: (_) => _handleRegister(),
-                          decoration: InputDecoration(
-                            labelText: 'Xác nhận mật khẩu *',
-                            hintText: 'Nhập lại mật khẩu ở trên',
-                            prefixIcon: const Icon(Icons.lock_reset_rounded),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureConfirmPassword
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined,
-                                color: AppColors.secondary,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscureConfirmPassword =
-                                      !_obscureConfirmPassword;
-                                });
-                              },
-                              tooltip: _obscureConfirmPassword
-                                  ? 'Hiển thị mật khẩu'
-                                  : 'Ẩn mật khẩu',
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Vui lòng xác nhận mật khẩu';
-                            }
-                            if (value != _passwordController.text) {
-                              return 'Mật khẩu xác nhận không trùng khớp';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 26),
-
-                        // Nút Đăng ký
-                        SizedBox(
-                          height: 50,
-                          child: FilledButton(
-                            onPressed: _isLoading ? null : _handleRegister,
-                            style: FilledButton.styleFrom(
-                              backgroundColor: AppColors.primaryAction,
-                              foregroundColor: AppColors.textLight,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: _isLoading
-                                ? const SizedBox(
-                                    width: 22,
-                                    height: 22,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : const Text(
-                                    'Đăng ký tài khoản',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: Colors.white,
                                   ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Liên kết điều hướng về trang Đăng nhập
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            const Text(
-                              'Đã có tài khoản? ',
-                              style: TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 14,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: _isLoading
-                                  ? null
-                                  : () => Navigator.of(context).pop(),
-                              style: TextButton.styleFrom(
-                                foregroundColor: AppColors.primaryAction,
-                                padding: const EdgeInsets.symmetric(horizontal: 4),
-                                minimumSize: Size.zero,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              child: const Text(
-                                'Đăng nhập ngay',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                )
+                              : const Text(
+                                  'Đăng ký tài khoản',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Liên kết điều hướng về trang Đăng nhập
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          const Text(
+                            'Đã có tài khoản? ',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 14,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: _isLoading
+                                ? null
+                                : () => Navigator.of(context).pop(),
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppColors.primaryAction,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            child: const Text(
+                              'Đăng nhập ngay',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
         ),
+      ),
     );
   }
 }

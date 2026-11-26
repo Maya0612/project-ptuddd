@@ -6,10 +6,7 @@ import 'package:nhom14_app/screens/register_screen.dart';
 
 void main() {
   Widget createTestWidget(Widget child) {
-    return MaterialApp(
-      theme: AppTheme.lightTheme,
-      home: child,
-    );
+    return MaterialApp(theme: AppTheme.lightTheme, home: child);
   }
 
   void setupScreenSize(WidgetTester tester) {
@@ -21,13 +18,18 @@ void main() {
     });
   }
 
-  testWidgets('RegisterScreen renders all 4 input fields and submit button', (WidgetTester tester) async {
+  testWidgets('RegisterScreen renders all 4 input fields and submit button', (
+    WidgetTester tester,
+  ) async {
     setupScreenSize(tester);
     await tester.pumpWidget(createTestWidget(const RegisterScreen()));
 
     // 1. Kiểm tra tiêu đề và thông tin
     expect(find.text('Tạo Tài Khoản Mới'), findsOneWidget);
-    expect(find.text('HỆ THỐNG HỖ TRỢ ĐỒ ÁN TỐT NGHIỆP CHO SINH VIÊN'), findsOneWidget);
+    expect(
+      find.text('HỆ THỐNG HỖ TRỢ ĐỒ ÁN TỐT NGHIỆP CHO SINH VIÊN'),
+      findsOneWidget,
+    );
 
     // 2. Kiểm tra đủ 4 trường nhập liệu
     expect(find.byType(TextFormField), findsNWidgets(4));
@@ -41,7 +43,9 @@ void main() {
     expect(find.text('Đăng nhập ngay'), findsOneWidget);
   });
 
-  testWidgets('RegisterScreen validation fails when fields are empty', (WidgetTester tester) async {
+  testWidgets('RegisterScreen validation fails when fields are empty', (
+    WidgetTester tester,
+  ) async {
     setupScreenSize(tester);
     await tester.pumpWidget(createTestWidget(const RegisterScreen()));
 
@@ -56,7 +60,9 @@ void main() {
     expect(find.text('Vui lòng xác nhận mật khẩu'), findsOneWidget);
   });
 
-  testWidgets('RegisterScreen validates invalid email and short password', (WidgetTester tester) async {
+  testWidgets('RegisterScreen validates invalid email and short password', (
+    WidgetTester tester,
+  ) async {
     setupScreenSize(tester);
     await tester.pumpWidget(createTestWidget(const RegisterScreen()));
 
@@ -76,12 +82,17 @@ void main() {
     await tester.tap(registerBtn);
     await tester.pump();
 
-    expect(find.text('Email không hợp lệ (ví dụ: sinhvien@e.tlu.edu.vn)'), findsOneWidget);
+    expect(
+      find.text('Email không hợp lệ (ví dụ: sinhvien@e.tlu.edu.vn)'),
+      findsOneWidget,
+    );
     expect(find.text('Mật khẩu phải có ít nhất 6 ký tự'), findsOneWidget);
     expect(find.text('Mật khẩu xác nhận không trùng khớp'), findsOneWidget);
   });
 
-  testWidgets('RegisterScreen validates password confirmation match', (WidgetTester tester) async {
+  testWidgets('RegisterScreen validates password confirmation match', (
+    WidgetTester tester,
+  ) async {
     setupScreenSize(tester);
     await tester.pumpWidget(createTestWidget(const RegisterScreen()));
 
@@ -104,7 +115,33 @@ void main() {
     expect(find.text('Mật khẩu xác nhận không trùng khớp'), findsNothing);
   });
 
-  testWidgets('Navigation from LoginScreen to RegisterScreen works', (WidgetTester tester) async {
+  testWidgets('shows the underlying error when Supabase is unavailable', (
+    WidgetTester tester,
+  ) async {
+    setupScreenSize(tester);
+    await tester.pumpWidget(createTestWidget(const RegisterScreen()));
+
+    final fields = find.byType(TextFormField);
+    await tester.enterText(fields.at(0), 'Nguyễn Văn A');
+    await tester.enterText(fields.at(1), 'student@example.com');
+    await tester.enterText(fields.at(2), 'password123');
+    await tester.enterText(fields.at(3), 'password123');
+
+    final registerButton = find.text('Đăng ký tài khoản');
+    await tester.ensureVisible(registerButton);
+    await tester.tap(registerButton);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(
+      find.textContaining('Supabase chưa được khởi tạo thành công'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('Navigation from LoginScreen to RegisterScreen works', (
+    WidgetTester tester,
+  ) async {
     setupScreenSize(tester);
     await tester.pumpWidget(createTestWidget(const LoginScreen()));
 
@@ -126,7 +163,10 @@ void main() {
     await tester.pumpAndSettle();
 
     // Quay lại màn hình Đăng nhập
-    expect(find.text('HỆ THỐNG HỖ TRỢ ĐỒ ÁN TỐT NGHIỆP CHO SINH VIÊN'), findsOneWidget);
+    expect(
+      find.text('HỆ THỐNG HỖ TRỢ ĐỒ ÁN TỐT NGHIỆP CHO SINH VIÊN'),
+      findsOneWidget,
+    );
     expect(find.text('Đăng nhập để tiếp tục'), findsOneWidget);
   });
 }

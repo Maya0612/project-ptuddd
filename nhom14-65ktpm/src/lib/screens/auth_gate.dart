@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../core/supabase_config.dart';
 import '../core/theme/app_theme.dart';
 import 'home_screen.dart';
@@ -71,7 +72,9 @@ class _AuthGateState extends State<AuthGate> {
       try {
         final res = await supabase.auth.refreshSession();
         currentSession = res.session;
-      } catch (_) {
+      } catch (error, stackTrace) {
+        debugPrint('[AuthGate] Session refresh failed: $error');
+        debugPrint('$stackTrace');
         currentSession = null;
       }
     }
@@ -150,10 +153,7 @@ class SplashLoadingView extends StatelessWidget {
             const SizedBox(height: 8),
             const Text(
               'Đang kiểm tra phiên đăng nhập...',
-              style: TextStyle(
-                fontSize: 13,
-                color: AppColors.textSecondary,
-              ),
+              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 24),
             const SizedBox(
