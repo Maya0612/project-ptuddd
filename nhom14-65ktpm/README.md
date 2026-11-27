@@ -161,7 +161,7 @@ erDiagram
     PROJECTS {
         uuid id PK
         uuid field_id FK
-        text title
+        text name
     }
     FAVORITES {
         uuid id PK
@@ -215,12 +215,16 @@ Nếu cấu trúc thực tế trong repository khác sơ đồ này, cần đố
 
 ## 8. Khởi chạy ứng dụng Flutter
 
+Ứng dụng dùng `supabase_flutter`, `provider` và `url_launcher`. Tại thư mục
+`src`, lấy Supabase Project URL và publishable/anon key từ Project Settings →
+API. Không dùng `service_role` key và không ghi giá trị thật vào mã nguồn.
+
 Mở terminal tại thư mục nhóm rồi chạy:
 
 ```bash
 cd nhom14-65ktpm/src
 flutter pub get
-flutter run
+flutter run --dart-define=SUPABASE_URL=https://YOUR_PROJECT_ID.supabase.co --dart-define=SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
 Nếu đang ở thư mục `nhom14-65ktpm` thì chỉ cần:
@@ -228,10 +232,13 @@ Nếu đang ở thư mục `nhom14-65ktpm` thì chỉ cần:
 ```bash
 cd src
 flutter pub get
-flutter run
+flutter run --dart-define=SUPABASE_URL=https://YOUR_PROJECT_ID.supabase.co --dart-define=SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
 Yêu cầu: đã cài Flutter SDK, Android Studio hoặc thiết bị/giả lập phù hợp. Phiên bản Flutter/Dart và cấu hình môi trường cụ thể cần được ghi nhận trong `danhsachnhom.md` khi nhóm chốt môi trường dùng chung.
+
+Tệp `src/.env.example` chỉ là mẫu tham khảo; Flutter không tự nạp `.env`.
+Khi chạy, truyền cấu hình bằng hai cờ `--dart-define` như ví dụ trên.
 
 ## 9. Bảo mật
 
