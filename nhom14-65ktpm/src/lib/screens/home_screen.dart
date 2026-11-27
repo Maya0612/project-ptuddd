@@ -1,3 +1,4 @@
+import 'personal_topics_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/supabase_config.dart';
@@ -523,13 +524,8 @@ class _HomeScreenState extends State<HomeScreen> {
           icon: Icons.auto_awesome_rounded,
         );
       case 3:
-        return const ModulePlaceholderScreen(
-          moduleTitle: 'Quản lý đề tài cá nhân',
-          assignee: 'TV4 – Trịnh Mạnh Đức',
-          description:
-              'Lưu trữ và quản lý các ý tưởng đề tài cá nhân hoặc lưu từ gợi ý của AI. '
-              'Cho phép thêm mới, chỉnh sửa, xóa và theo dõi trạng thái đề tài cá nhân.',
-          icon: Icons.assignment_rounded,
+        return const PersonalTopicsScreen(
+          
         );
       case 4:
         return const ModulePlaceholderScreen(

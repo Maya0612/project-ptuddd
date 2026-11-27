@@ -1,44 +1,65 @@
+class FieldItem {
+  final String id;
+  final String name;
+
+  FieldItem({required this.id, required this.name});
+
+  factory FieldItem.fromJson(Map<String, dynamic> json) {
+    return FieldItem(
+      id: json['id'].toString(),
+      name: json['name'] ?? json['title'] ?? 'Chưa đặt tên',
+    );
+  }
+}
+
 class PersonalTopic {
   final String? id;
   final String userId;
+  final String? fieldId;
+  final String? fieldName; // Dùng để hiển thị tên lĩnh vực khi join bảng fields
   final String title;
   final String? description;
   final String? objectives;
-  final String? field;
   final String? technologies;
   final String? implementationPlan;
-  final String status;
-  final String source;
+  final String status; // 'idea', 'in_progress', 'completed'
+  final String source; // 'manual', 'ai_suggestion'
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
   PersonalTopic({
     this.id,
     required this.userId,
+    this.fieldId,
+    this.fieldName,
     required this.title,
     this.description,
     this.objectives,
-    this.field,
     this.technologies,
     this.implementationPlan,
-    this.status = 'Ý tưởng',
+    this.status = 'idea',
     this.source = 'manual',
     this.createdAt,
     this.updatedAt,
   });
 
-  // Chuyển dữ liệu từ Supabase (JSON) sang Object Flutter
   factory PersonalTopic.fromJson(Map<String, dynamic> json) {
+    String? extractedFieldName;
+    if (json['fields'] != null && json['fields'] is Map) {
+      extractedFieldName = json['fields']['name'] ?? json['fields']['title'];
+    }
+
     return PersonalTopic(
-      id: json['id'],
-      userId: json['user_id'],
-      title: json['title'],
+      id: json['id']?.toString(),
+      userId: json['user_id'].toString(),
+      fieldId: json['field_id']?.toString(),
+      fieldName: extractedFieldName,
+      title: json['title'] ?? '',
       description: json['description'],
       objectives: json['objectives'],
-      field: json['field'],
       technologies: json['technologies'],
       implementationPlan: json['implementation_plan'],
-      status: json['status'] ?? 'Ý tưởng',
+      status: json['status'] ?? 'idea',
       source: json['source'] ?? 'manual',
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
@@ -49,20 +70,32 @@ class PersonalTopic {
     );
   }
 
-  // Chuyển dữ liệu từ Flutter sang JSON để gửi lên Supabase
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
       'user_id': userId,
+      'field_id': fieldId,
       'title': title,
       'description': description,
       'objectives': objectives,
-      'field': field,
       'technologies': technologies,
       'implementation_plan': implementationPlan,
       'status': status,
       'source': source,
       'updated_at': DateTime.now().toIso8601String(),
     };
+  }
+
+  // Hàm tiện ích chuyển mã status tiếng Anh sang nhãn tiếng Việt hiển thị trên UI
+  String get statusLabel {
+    switch (status) {
+      case 'in_progress':
+        return 'Đang phát triển';
+      case 'completed':
+        return 'Hoàn thành';
+      case 'idea':
+      default:
+        return 'Ý tưởng';
+    }
   }
 }
