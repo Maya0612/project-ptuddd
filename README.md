@@ -330,11 +330,3 @@ git push origin <ten-nhom>-<ten-lop>
 | 6 | Lệnh `git add` | Luôn sử dụng `git add <tennhom-tenlop>/`, không `git add .` tại thư mục gốc. | Bắt buộc |
 | 7 | Tính toàn vẹn nhánh chung | Không sửa đổi, không xóa thư mục hoặc mã nguồn của các nhóm khác. | Bắt buộc |
 | 8 | Tiêu đề Pull Request | Đúng định dạng `[Nộp bài] <tennhom-tenlop> - <Tên đề tài>`. | Bắt buộc |
-
-## Khởi tạo cơ sở dữ liệu (Supabase)
-
-1. Tạo project tại https://supabase.com.
-2. Vào SQL Editor, chạy lần lượt các file trong `supabase/migrations/` theo thứ tự tên file.
-3. Chạy `supabase/seed.sql` để có dữ liệu mẫu (dữ liệu giả).
-4. Sao chép `.env.example` thành `.env`, điền `SUPABASE_URL` và `SUPABASE_ANON_KEY` lấy từ Project Settings → API (không commit file `.env`).
-5. Xem sơ đồ và mô tả cơ sở dữ liệu tại [`docs/erd.md`](docs/erd.md).

@@ -525,6 +525,7 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       case 3:
         return const PersonalTopicsScreen(
+          
         );
       case 4:
         return const ModulePlaceholderScreen(

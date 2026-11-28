@@ -4,7 +4,7 @@ import '../core/supabase_config.dart';
 import '../core/theme/app_theme.dart';
 
 /// Màn hình đăng ký tài khoản sinh viên/người dùng mới.
-///
+/// 
 /// Tuân thủ hệ thống màu chuẩn hóa:
 /// - Primary background: #EBEAFF
 /// - Secondary: #9694FF

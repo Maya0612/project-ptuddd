@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 /// Hệ thống màu chuẩn hóa và phối màu trung tính cao cấp của ứng dụng:
-///
+/// 
 /// 4 mã màu thương hiệu bắt buộc:
 /// - [primaryBackground]: #EBEAFF (Chỉ dùng làm nền nhấn nhẹ, badge, icon container)
 /// - [secondary]: #9694FF (Dùng cho đường viền tinh tế, icon phụ, trạng thái tương tác)
 /// - [primaryAction]: #3D3BF3 (Hành động chính, nút bấm, điểm nhấn phân cấp; không phủ kín diện tích lớn)
 /// - [danger]: #FF2929 (Cảnh báo, lỗi, hành động nguy hiểm/đăng xuất)
-///
+/// 
 /// Màu trung tính chuyên nghiệp:
 /// - [surface]: #FFFFFF (Bề mặt chính cho Scaffold, Card, Sidebar, Dialog)
 /// - [surfaceAlt]: #F9F9FD (Bề mặt phụ siêu nhẹ giúp tạo chiều sâu nhẹ nhàng)

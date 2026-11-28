@@ -29,7 +29,6 @@ Pods/
 
 # Environment and sensitive keys
 .env
-.env.local
 .env.*
 !.env.example
 
@@ -41,4 +40,3 @@ Pods/
 *~
 .DS_Store
 Thumbs.db
-supabase/.temp/
