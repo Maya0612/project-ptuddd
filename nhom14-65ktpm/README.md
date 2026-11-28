@@ -161,7 +161,7 @@ erDiagram
     PROJECTS {
         uuid id PK
         uuid field_id FK
-        text title
+        text name
     }
     FAVORITES {
         uuid id PK
@@ -215,6 +215,10 @@ Nếu cấu trúc thực tế trong repository khác sơ đồ này, cần đố
 
 ## 8. Cấu hình môi trường và khởi chạy ứng dụng
 
+Ứng dụng dùng `supabase_flutter`, `provider` và `url_launcher`. Tại thư mục
+`src`, lấy Supabase Project URL và publishable/anon key từ Project Settings →
+API. Không dùng `service_role` key và không ghi giá trị thật vào mã nguồn.
+
 ### 8.1. Cài đặt các gói phụ thuộc (Dependencies)
 Mở terminal tại thư mục mã nguồn `nhom14-65ktpm/src`:
 
@@ -247,6 +251,8 @@ flutter pub get
 Chạy ứng dụng kèm cờ nạp `env.json`:
 
 ```bash
+cd nhom14-65ktpm/src
+
 # Khởi chạy trên thiết bị đang kết nối (Android/Windows/Web):
 flutter run --dart-define-from-file=env.json
 
@@ -260,6 +266,10 @@ Trước khi commit, thành viên chạy kiểm thử để đảm bảo tính n
 ```bash
 flutter test --dart-define-from-file=env.json
 ```
+
+Tệp `src/.env.example` chỉ là mẫu tham khảo; Flutter không tự nạp `.env`.
+Khi chạy, Flutter nạp cấu hình từ `env.json` bằng
+`--dart-define-from-file=env.json`.
 
 ## 9. Bảo mật
 
@@ -284,3 +294,4 @@ flutter test --dart-define-from-file=env.json
 ---
 
 **Lưu ý:** README này mô tả định hướng hiện tại của nhóm. Khi nhóm thống nhất schema, kiến trúc hoặc phạm vi chính thức, TV1 cập nhật tài liệu và thông báo cho các thành viên.
+Lưu ý Xây dựng chức năng thêm, xem, sửa và xóa thông tin đồ án theo quyền được cấp.
