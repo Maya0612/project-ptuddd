@@ -135,16 +135,20 @@ class _HomeScreenState extends State<HomeScreen> {
     if (role == 'student') {
       return _allNavItems;
     }
-    // Lecturer và Admin: chỉ Tổng quan (0), Kho đồ án (1), Hồ sơ (5)
-    return _allNavItems
-        .where(
-          (item) =>
-              item.targetIndex == 0 ||
-              item.targetIndex == 1 ||
-              item.targetIndex == 5,
-        )
-        .toList();
+    return const [
+      AppNavItem(label: 'Tổng quan', icon: Icons.dashboard_outlined, activeIcon: Icons.dashboard_rounded, targetIndex: 0),
+      AppNavItem(label: 'Quản lý kho đồ án', icon: Icons.library_books_outlined, activeIcon: Icons.library_books_rounded, targetIndex: 1),
+      AppNavItem(label: 'Duyệt đề xuất', icon: Icons.fact_check_outlined, activeIcon: Icons.fact_check_rounded, targetIndex: 6),
+      AppNavItem(label: 'Hồ sơ', icon: Icons.person_outline_rounded, activeIcon: Icons.person_rounded, targetIndex: 5),
+    ];
   }
+
+  String get _roleLabel => switch (_currentRole) {
+    'admin' => 'Quản trị viên',
+    'lecturer' => 'Giảng viên',
+    'student' => 'Sinh viên',
+    _ => 'Chưa xác định',
+  };
 
   void _populateProfileControllers() {
     if (_userProfile == null) return;
@@ -746,10 +750,10 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         if (role == 'lecturer' || role == 'admin') {
           return const ModulePlaceholderScreen(
-            moduleTitle: 'Kho đồ án & Quản lý kho',
+            moduleTitle: 'Quản lý kho đồ án',
             assignee: 'TV2 – Phạm Kim Anh',
             description:
-                'Quản lý danh sách đồ án tốt nghiệp khóa trước, duyệt đề xuất bổ sung đồ án '
+                'Quản lý danh sách đồ án tốt nghiệp khóa trước '
                 'và quản trị dữ liệu kho lưu trữ dành cho Giảng viên / Ban quản trị.',
             icon: Icons.inventory_2_rounded,
           );
@@ -796,6 +800,16 @@ class _HomeScreenState extends State<HomeScreen> {
               'Xây dựng kế hoạch chi tiết, phân chia các đầu việc, đặt thời hạn '
               'và theo dõi tiến độ hoàn thành các giai đoạn của đồ án tốt nghiệp.',
           icon: Icons.calendar_month_rounded,
+        );
+      case 6:
+        if (role != 'admin' && role != 'lecturer') {
+          return _buildOverviewTab();
+        }
+        return const ModulePlaceholderScreen(
+          moduleTitle: 'Duyệt đề xuất',
+          assignee: 'TV2 – Phạm Kim Anh',
+          description: 'Xem, duyệt hoặc từ chối đề xuất bổ sung đồ án vào kho.',
+          icon: Icons.fact_check_rounded,
         );
       case 5:
         return _buildProfileTab();
@@ -896,9 +910,7 @@ class _HomeScreenState extends State<HomeScreen> {
               : (currentUser?.email?.split('@').first.isNotEmpty == true
                     ? currentUser!.email!.split('@').first
                     : 'Người dùng'));
-    final userRole = _currentRole != null
-        ? _currentRole!.toUpperCase()
-        : 'CHƯA XÁC ĐỊNH';
+    final userRole = _roleLabel;
 
     return Container(
       padding: const EdgeInsets.all(22.0),
@@ -979,81 +991,32 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Khu vực thống kê: Card gọn, viền mảnh, rõ ràng thông số
   Widget _buildStatsOverviewSection() {
+    final role = _currentRole;
+    if (role == null) return const SizedBox.shrink();
+    final isStudent = role == 'student';
+    final cards = [
+      _buildStatCard(title: 'Đồ án đã công bố', value: '—', subtitle: 'Chưa tích hợp thống kê', icon: Icons.library_books_rounded),
+      if (isStudent) ...[
+        _buildStatCard(title: 'Đồ án yêu thích', value: '—', subtitle: 'Chưa tích hợp thống kê', icon: Icons.bookmark_border_rounded, accent: const Color(0xFF946200)),
+        _buildStatCard(title: 'Đề tài cá nhân', value: '—', subtitle: 'Chưa tích hợp thống kê', icon: Icons.assignment_rounded, accent: const Color(0xFF475569)),
+        _buildStatCard(title: 'Tiến độ hoàn thành', value: '—', subtitle: 'Chưa tích hợp thống kê', icon: Icons.trending_up_rounded, accent: const Color(0xFF166534)),
+      ] else ...[
+        _buildStatCard(title: 'Đề xuất chờ duyệt', value: '—', subtitle: 'Chưa tích hợp thống kê', icon: Icons.pending_actions_rounded, accent: const Color(0xFF946200)),
+        _buildStatCard(title: 'Đề xuất bị từ chối', value: '—', subtitle: 'Chưa tích hợp thống kê', icon: Icons.cancel_outlined, accent: AppColors.danger),
+      ],
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Tổng quan đồ án',
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-          ),
-        ),
+        Text(isStudent ? 'Tổng quan đồ án' : 'Tổng quan quản lý', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
         const SizedBox(height: 12),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final isNarrow = constraints.maxWidth < 640;
-
-            if (isNarrow) {
-              return Column(
-                children: [
-                  _buildStatCard(
-                    title: 'Đề tài kho đồ án',
-                    value: '0',
-                    subtitle: 'Đồ án đã duyệt',
-                    icon: Icons.library_books_rounded,
-                  ),
-                  const SizedBox(height: 10),
-                  _buildStatCard(
-                    title: 'Đề tài đã lưu',
-                    value: '0',
-                    subtitle: 'Ý tưởng cá nhân',
-                    icon: Icons.bookmark_border_rounded,
-                  ),
-                  const SizedBox(height: 10),
-                  _buildStatCard(
-                    title: 'Tiến độ hoàn thành',
-                    value: '0%',
-                    subtitle: 'Kế hoạch hiện tại',
-                    icon: Icons.trending_up_rounded,
-                  ),
-                ],
-              );
-            }
-
-            return Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    title: 'Đề tài kho đồ án',
-                    value: '0',
-                    subtitle: 'Đồ án đã duyệt',
-                    icon: Icons.library_books_rounded,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: _buildStatCard(
-                    title: 'Đề tài đã lưu',
-                    value: '0',
-                    subtitle: 'Ý tưởng cá nhân',
-                    icon: Icons.bookmark_border_rounded,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: _buildStatCard(
-                    title: 'Tiến độ hoàn thành',
-                    value: '0%',
-                    subtitle: 'Kế hoạch hiện tại',
-                    icon: Icons.trending_up_rounded,
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
+        LayoutBuilder(builder: (context, constraints) {
+          final columns = constraints.maxWidth >= 960 ? (isStudent ? 4 : 3) : constraints.maxWidth >= 640 ? 2 : 1;
+          final width = (constraints.maxWidth - (columns - 1) * 14) / columns;
+          return Wrap(spacing: 14, runSpacing: 14, children: [
+            for (final card in cards) SizedBox(width: width, child: card),
+          ]);
+        }),
       ],
     );
   }
@@ -1063,6 +1026,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String value,
     required String subtitle,
     required IconData icon,
+    Color accent = AppColors.primary,
   }) {
     return Container(
       padding: const EdgeInsets.all(18.0),
@@ -1077,10 +1041,10 @@ class _HomeScreenState extends State<HomeScreen> {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: AppColors.primaryLight,
+              color: accent.withValues(alpha: 0.09),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: AppColors.primary, size: 20),
+            child: Icon(icon, color: accent, size: 20),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -1128,22 +1092,24 @@ class _HomeScreenState extends State<HomeScreen> {
     final allQuickModules = [
       if (isStudent || isLecturerOrAdmin)
         _QuickAccessItem(
-          title: isLecturerOrAdmin ? 'Kho & Quản lý kho' : 'Kho đồ án',
+          title: isLecturerOrAdmin ? 'Quản lý kho đồ án' : 'Kho đồ án',
           subtitle: isLecturerOrAdmin
-              ? 'Quản lý kho lưu trữ đồ án và duyệt đề xuất'
+              ? 'Quản lý dữ liệu đồ án đã lưu trữ'
               : 'Tra cứu & tham khảo đề tài khóa trước',
           icon: isLecturerOrAdmin
               ? Icons.inventory_2_rounded
               : Icons.library_books_rounded,
-          assignee: 'TV2',
+
           targetIndex: 1,
         ),
+      if (isLecturerOrAdmin)
+        _QuickAccessItem(title: 'Duyệt đề xuất', subtitle: 'Xét duyệt đề xuất bổ sung đồ án', icon: Icons.fact_check_rounded, targetIndex: 6),
       if (isStudent)
         _QuickAccessItem(
           title: 'AI gợi ý đề tài',
           subtitle: 'Gợi ý & đối chiếu hướng nghiên cứu',
           icon: Icons.auto_awesome_rounded,
-          assignee: 'TV3',
+
           targetIndex: 2,
         ),
       if (isStudent)
@@ -1151,7 +1117,7 @@ class _HomeScreenState extends State<HomeScreen> {
           title: 'Đề tài cá nhân',
           subtitle: 'Quản lý danh sách đề tài tự chọn',
           icon: Icons.assignment_rounded,
-          assignee: 'TV4',
+
           targetIndex: 3,
         ),
       if (isStudent)
@@ -1159,14 +1125,14 @@ class _HomeScreenState extends State<HomeScreen> {
           title: 'Kế hoạch & tiến độ',
           subtitle: 'Lập danh sách đầu việc & mốc thời gian',
           icon: Icons.calendar_month_rounded,
-          assignee: 'TV5',
+
           targetIndex: 4,
         ),
       _QuickAccessItem(
         title: 'Hồ sơ cá nhân',
         subtitle: 'Thông tin tài khoản, lớp sinh hoạt',
         icon: Icons.person_rounded,
-        assignee: 'TV1',
+
         targetIndex: 5,
       ),
     ];
@@ -1237,29 +1203,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        module.title,
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w700,
-                                          color: AppColors.textPrimary,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      module.assignee,
-                                      style: const TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.secondary,
-                                      ),
-                                    ),
-                                  ],
+                                Text(
+                                  module.title,
+                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                                 const SizedBox(height: 3),
                                 Text(
@@ -1324,7 +1272,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'Chưa có hoạt động nào gần đây',
+                  'Hoạt động chưa được cập nhật',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -1333,7 +1281,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'Các thao tác tra cứu, lưu đề tài và cập nhật tiến độ sẽ xuất hiện tại đây.',
+                  'Chưa tích hợp dữ liệu hoạt động gần đây.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
@@ -1765,14 +1713,12 @@ class _QuickAccessItem {
   final String title;
   final String subtitle;
   final IconData icon;
-  final String assignee;
   final int targetIndex;
 
   _QuickAccessItem({
     required this.title,
     required this.subtitle,
     required this.icon,
-    required this.assignee,
     required this.targetIndex,
   });
 }
