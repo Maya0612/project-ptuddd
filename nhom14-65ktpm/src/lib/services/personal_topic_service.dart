@@ -1,10 +1,9 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'personal_topic_model.dart';
+import '../models/personal_topic_model.dart';
 
 class PersonalTopicService {
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  // Lấy ID của sinh viên đang đăng nhập
   String get _currentUserId {
     final user = _supabase.auth.currentUser;
     if (user == null) {
@@ -13,11 +12,23 @@ class PersonalTopicService {
     return user.id;
   }
 
-  // 1. Lấy danh sách toàn bộ đề tài cá nhân của sinh viên hiện tại
+  // 0. Lấy danh sách lĩnh vực từ bảng fields để hiển thị trong Dropdown
+  Future<List<FieldItem>> fetchFields() async {
+    try {
+      final response = await _supabase.from('fields').select();
+      return (response as List)
+          .map((json) => FieldItem.fromJson(json))
+          .toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  // 1. Lấy danh sách toàn bộ đề tài cá nhân (kèm tên lĩnh vực nếu có)
   Future<List<PersonalTopic>> fetchPersonalTopics() async {
     final response = await _supabase
         .from('personal_topics')
-        .select()
+        .select(', fields()')
         .eq('user_id', _currentUserId)
         .order('created_at', ascending: false);
 
@@ -35,7 +46,7 @@ class PersonalTopicService {
     final response = await _supabase
         .from('personal_topics')
         .insert(data)
-        .select()
+        .select(', fields()')
         .single();
 
     return PersonalTopic.fromJson(response);
@@ -46,26 +57,26 @@ class PersonalTopicService {
     required String title,
     String? description,
     String? objectives,
-    String? field,
+    String? fieldId,
     String? technologies,
     String? implementationPlan,
   }) async {
     final data = {
       'user_id': _currentUserId,
+      'field_id': fieldId,
       'title': title,
       'description': description,
       'objectives': objectives,
-      'field': field,
       'technologies': technologies,
       'implementation_plan': implementationPlan,
-      'status': 'Ý tưởng',
+      'status': 'idea',
       'source': 'ai_suggestion',
     };
 
     final response = await _supabase
         .from('personal_topics')
         .insert(data)
-        .select()
+        .select(', fields()')
         .single();
 
     return PersonalTopic.fromJson(response);
