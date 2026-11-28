@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'core/supabase_config.dart';
+import 'core/theme/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/project_provider.dart';
 import 'screens/project_list_screen.dart';
@@ -20,10 +21,7 @@ class MyApp extends StatelessWidget {
     if (!SupabaseConfig.isInitialized) {
       return MaterialApp(
         title: 'Kho đồ án',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-          useMaterial3: true,
-        ),
+        theme: AppTheme.lightTheme,
         home: const _ConfigurationRequiredScreen(),
       );
     }
@@ -35,10 +33,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Kho đồ án',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-          useMaterial3: true,
-        ),
+        theme: AppTheme.lightTheme,
         home: const _AppHome(),
       ),
     );
@@ -70,7 +65,8 @@ class _ConfigurationRequiredScreen extends StatelessWidget {
           padding: EdgeInsets.all(24),
           child: Text(
             'Thiếu cấu hình Supabase. Khởi chạy với SUPABASE_URL và '
-            'SUPABASE_ANON_KEY bằng cờ --dart-define.',
+            'SUPABASE_ANON_KEY trong env.json, sau đó chạy với '
+            '--dart-define-from-file=env.json.',
             textAlign: TextAlign.center,
           ),
         ),
