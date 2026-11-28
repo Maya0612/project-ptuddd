@@ -63,7 +63,6 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
       final updatedTask = TaskModel(
         id: task?.id ?? '',
         planId: widget.plan.id,
-        userId: task?.userId ?? '',
         phase: result.phase,
         title: result.title,
         description: result.description,
@@ -163,7 +162,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
   }
 
   int _compareTasks(TaskModel first, TaskModel second) {
-    final phaseComparison = first.phase.compareTo(second.phase);
+    final phaseComparison = (first.phase ?? '').compareTo(second.phase ?? '');
     return phaseComparison != 0
         ? phaseComparison
         : first.orderIndex.compareTo(second.orderIndex);
@@ -343,7 +342,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
   List<Widget> _buildPhaseGroups() {
     final groupedTasks = <String, List<TaskModel>>{};
     for (final task in _tasks) {
-      groupedTasks.putIfAbsent(task.phase, () => []).add(task);
+      groupedTasks.putIfAbsent(task.phase ?? 'Chưa phân loại', () => []).add(task);
     }
 
     return groupedTasks.entries.map((entry) {

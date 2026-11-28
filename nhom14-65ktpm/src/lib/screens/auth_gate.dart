@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -50,19 +51,41 @@ class _AuthGateState extends State<AuthGate> {
       return;
     }
 
-    // Đăng ký listener duy nhất theo dõi thay đổi phiên (đăng nhập, đăng xuất, token refresh)
-    _authSubscription = supabase.auth.onAuthStateChange.listen((data) {
-      if (!mounted) return;
-      setState(() {
-        _session = data.session;
-        _isLoading = false;
-      });
+    // Đăng ký listener duy nhất theo dõi thay đổi phiên (đăng nhập, đăng xuất, đổi người dùng)
+    _authSubscription = supabase.auth.onAuthStateChange.listen(
+      (data) {
+        if (!mounted) return;
 
-      // Nếu đang có route phụ/dialog được push phía trên, đóng lại để về root
-      if (mounted && Navigator.of(context).canPop()) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
-      }
-    });
+        final event = data.event;
+        final newSession = data.session;
+
+        // Chỉ điều hướng về root khi thực sự đăng nhập, đăng xuất hoặc đổi tài khoản
+        final shouldResetNavigation =
+            event == AuthChangeEvent.signedIn ||
+            event == AuthChangeEvent.signedOut ||
+            event == AuthChangeEvent.userUpdated ||
+            (_session?.user.id != newSession?.user.id);
+
+        setState(() {
+          _session = newSession;
+          _isLoading = false;
+        });
+
+        if (shouldResetNavigation &&
+            mounted &&
+            Navigator.of(context).canPop()) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+      },
+      onError: (error) {
+        debugPrint('[AuthGate] Lỗi stream onAuthStateChange: $error');
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      },
+    );
 
     // Đọc phiên đăng nhập hiện tại từ bộ nhớ đệm của Supabase Client
     Session? currentSession = supabase.auth.currentSession;
@@ -101,7 +124,8 @@ class _AuthGateState extends State<AuthGate> {
     }
 
     if (_session != null) {
-      return const HomeScreen(
+      return HomeScreen(
+        key: ValueKey(_session!.user.id),
         title: 'HỆ THỐNG HỖ TRỢ ĐỒ ÁN TỐT NGHIỆP CHO SINH VIÊN',
       );
     }
@@ -111,10 +135,9 @@ class _AuthGateState extends State<AuthGate> {
 }
 
 /// Màn hình chờ hiển thị trong khi kiểm tra phiên đăng nhập ban đầu.
-/// Tuân thủ hệ thống màu chuẩn hóa:
-/// - Primary background: #EBEAFF
-/// - Secondary: #9694FF
-/// - Primary action: #3D3BF3
+/// Tuân thủ hệ thống màu Burgundy chuyên nghiệp:
+/// - Primary: #9F1239 (Burgundy)
+/// - Primary Light: #FFF5F5
 class SplashLoadingView extends StatelessWidget {
   const SplashLoadingView({super.key});
 
@@ -130,13 +153,13 @@ class SplashLoadingView extends StatelessWidget {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: AppColors.primaryBackground,
+                color: AppColors.primaryLight,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(
                 Icons.school_rounded,
                 size: 34,
-                color: AppColors.primaryAction,
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(height: 20),
@@ -161,7 +184,7 @@ class SplashLoadingView extends StatelessWidget {
               height: 24,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: AppColors.primaryAction,
+                color: AppColors.primary,
               ),
             ),
           ],

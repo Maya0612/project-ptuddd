@@ -6,11 +6,11 @@ import '../core/theme/app_theme.dart';
 import 'register_screen.dart';
 
 /// Màn hình đăng nhập sử dụng Email và Password với Supabase Auth.
-/// Tuân thủ hệ thống màu chuẩn hóa:
-/// - Primary background: #EBEAFF
-/// - Secondary: #9694FF
-/// - Primary action: #3D3BF3
-/// - Danger/error: #FF2929
+/// Tuân thủ hệ thống màu Burgundy chuyên nghiệp:
+/// - Primary: #9F1239 (Burgundy)
+/// - Primary Light: #FFF5F5
+/// - Secondary: #E8B4BC
+/// - Danger/error: #DC2626
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -45,17 +45,19 @@ class _LoginScreenState extends State<LoginScreen> {
     String? friendlyMessage;
     if (error is AuthException) {
       final msg = detail.toLowerCase();
-      if (msg.contains('invalid login credentials') ||
-          msg.contains('invalid_credentials') ||
-          error.statusCode == '400') {
-        friendlyMessage =
-            'Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.';
-      } else if (msg.contains('email not confirmed')) {
+      if (msg.contains('email not confirmed') ||
+          msg.contains('email_not_confirmed')) {
         friendlyMessage = 'Tài khoản chưa được kích hoạt qua email. Vui lòng kiểm tra hộp thư.';
       } else if (msg.contains('too many requests') ||
-          msg.contains('rate limit')) {
+          msg.contains('rate limit') ||
+          error.statusCode == '429') {
         friendlyMessage =
             'Bạn đã thử đăng nhập quá nhiều lần. Vui lòng thử lại sau ít phút.';
+      } else if (msg.contains('invalid login credentials') ||
+          msg.contains('invalid_credentials') ||
+          (error.statusCode == '400' && msg.contains('grant_type'))) {
+        friendlyMessage =
+            'Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.';
       }
     } else {
       final errStr = detail.toLowerCase();
@@ -129,10 +131,9 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
 
-        // Đăng nhập thành công. AuthGate lắng nghe onAuthStateChange
-        // sẽ tự động cập nhật giao diện sang MyHomePage.
+        // AuthGate theo dõi onAuthStateChange sẽ tự động điều hướng sang HomeScreen
         if (Navigator.of(context).canPop()) {
-          Navigator.of(context).popUntil((route) => route.isFirst);
+          Navigator.of(context).pop();
         }
       }
     } on AuthException catch (e) {
@@ -153,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surfaceAlt,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -181,13 +182,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: 56,
                           height: 56,
                           decoration: BoxDecoration(
-                            color: AppColors.primaryBackground,
+                            color: AppColors.primaryLight,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
                             Icons.school_rounded,
                             size: 30,
-                            color: AppColors.primaryAction,
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
@@ -286,7 +287,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: FilledButton(
                           onPressed: _isLoading ? null : _handleLogin,
                           style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.primaryAction,
+                            backgroundColor: AppColors.primary,
                             foregroundColor: AppColors.textLight,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -335,7 +336,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     );
                                   },
                             style: TextButton.styleFrom(
-                              foregroundColor: AppColors.primaryAction,
+                              foregroundColor: AppColors.primary,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 4,
                               ),

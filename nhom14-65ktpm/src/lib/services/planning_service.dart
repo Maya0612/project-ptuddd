@@ -30,23 +30,20 @@ class PlanningService {
 
   final SupabaseClient _client;
 
-  String get _currentUserId {
-    final user = _client.auth.currentUser;
-    if (user == null) {
+  void _requireSignedInUser() {
+    if (_client.auth.currentUser == null) {
       throw StateError('A signed-in user is required for planning operations.');
     }
-    return user.id;
   }
 
   Future<List<PlanModel>> getPlans({required String personalTopicId}) async {
-    final userId = _currentUserId;
+    _requireSignedInUser();
     final rows = await _execute<List<Map<String, dynamic>>>(
       'Load plans',
       () => _client
           .from('plans')
           .select('*, tasks(*)')
-          .eq('personal_topic_id', personalTopicId)
-          .eq('user_id', userId),
+          .eq('personal_topic_id', personalTopicId),
     );
 
     return rows
@@ -55,24 +52,22 @@ class PlanningService {
   }
 
   Future<PlanModel> createPlan(PlanModel plan) async {
-    final userId = _currentUserId;
-    final values = _planValues(plan)..['user_id'] = userId;
+    _requireSignedInUser();
     final row = await _execute<Map<String, dynamic>>(
       'Create plan',
-      () => _client.from('plans').insert(values).select().single(),
+      () => _client.from('plans').insert(_planValues(plan)).select().single(),
     );
     return PlanModel.fromJson(Map<String, dynamic>.from(row));
   }
 
   Future<PlanModel> updatePlan(PlanModel plan) async {
-    final userId = _currentUserId;
+    _requireSignedInUser();
     final row = await _execute<Map<String, dynamic>>(
       'Update plan',
       () => _client
           .from('plans')
           .update(_planValues(plan))
           .eq('id', plan.id)
-          .eq('user_id', userId)
           .select()
           .single(),
     );
@@ -80,14 +75,13 @@ class PlanningService {
   }
 
   Future<void> deletePlan({required String planId}) async {
-    final userId = _currentUserId;
+    _requireSignedInUser();
     final rows = await _execute<List<Map<String, dynamic>>>(
       'Delete plan',
       () => _client
           .from('plans')
           .delete()
           .eq('id', planId)
-          .eq('user_id', userId)
           .select('id'),
     );
     if (rows.isEmpty) {
@@ -98,14 +92,13 @@ class PlanningService {
   }
 
   Future<List<TaskModel>> getTasks({required String planId}) async {
-    final userId = _currentUserId;
+    _requireSignedInUser();
     final rows = await _execute<List<Map<String, dynamic>>>(
       'Load tasks',
       () => _client
           .from('tasks')
           .select()
           .eq('plan_id', planId)
-          .eq('user_id', userId)
           .order('phase')
           .order('order_index'),
     );
@@ -116,24 +109,22 @@ class PlanningService {
   }
 
   Future<TaskModel> createTask(TaskModel task) async {
-    final userId = _currentUserId;
-    final values = _taskValues(task)..['user_id'] = userId;
+    _requireSignedInUser();
     final row = await _execute<Map<String, dynamic>>(
       'Create task',
-      () => _client.from('tasks').insert(values).select().single(),
+      () => _client.from('tasks').insert(_taskValues(task)).select().single(),
     );
     return TaskModel.fromJson(Map<String, dynamic>.from(row));
   }
 
   Future<TaskModel> updateTask(TaskModel task) async {
-    final userId = _currentUserId;
+    _requireSignedInUser();
     final row = await _execute<Map<String, dynamic>>(
       'Update task',
       () => _client
           .from('tasks')
           .update(_taskValues(task))
           .eq('id', task.id)
-          .eq('user_id', userId)
           .select()
           .single(),
     );
@@ -141,14 +132,13 @@ class PlanningService {
   }
 
   Future<void> deleteTask({required String taskId}) async {
-    final userId = _currentUserId;
+    _requireSignedInUser();
     final rows = await _execute<List<Map<String, dynamic>>>(
       'Delete task',
       () => _client
           .from('tasks')
           .delete()
           .eq('id', taskId)
-          .eq('user_id', userId)
           .select('id'),
     );
     if (rows.isEmpty) {
@@ -162,19 +152,13 @@ class PlanningService {
     required String taskId,
     required TaskStatus status,
   }) async {
-    final userId = _currentUserId;
+    _requireSignedInUser();
     final row = await _execute<Map<String, dynamic>>(
       'Update task status',
       () => _client
           .from('tasks')
-          .update({
-            'status': status.toDatabaseValue(),
-            'completed_at': status == TaskStatus.done
-                ? DateTime.now().toUtc().toIso8601String()
-                : null,
-          })
+          .update({'status': status.toDatabaseValue()})
           .eq('id', taskId)
-          .eq('user_id', userId)
           .select()
           .single(),
     );
@@ -201,7 +185,6 @@ class PlanningService {
       'due_date': task.dueDate?.toIso8601String().split('T').first,
       'status': task.status.toDatabaseValue(),
       'order_index': task.orderIndex,
-      'completed_at': task.completedAt?.toUtc().toIso8601String(),
     };
   }
 

@@ -10,7 +10,6 @@ void main() {
     return TaskModel(
       id: id,
       planId: 'plan-1',
-      userId: 'user-1',
       title: 'Hoàn thành đề cương',
       phase: 'Chuẩn bị',
       description: 'Viết đề cương chi tiết',
@@ -26,7 +25,6 @@ void main() {
   PlanModel plan({List<TaskModel> tasks = const []}) {
     return PlanModel(
       id: 'plan-1',
-      userId: 'user-1',
       personalTopicId: 'topic-1',
       title: 'Kế hoạch tốt nghiệp',
       description: 'Chuẩn bị đồ án',
@@ -89,6 +87,25 @@ void main() {
       expect(decoded.status, TaskStatus.done);
       expect(decoded.completedAt, original.completedAt);
       expect(decoded.orderIndex, original.orderIndex);
+    });
+
+    test('reads nullable phase without requiring a task user id', () {
+      final decoded = TaskModel.fromJson({
+        'id': 'task-1',
+        'plan_id': 'plan-1',
+        'title': 'Hoàn thành đề cương',
+        'phase': null,
+        'description': null,
+        'due_date': null,
+        'status': 'todo',
+        'order_index': 0,
+        'completed_at': null,
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': createdAt.toIso8601String(),
+      });
+
+      expect(decoded.phase, isNull);
+      expect(decoded.toJson().containsKey('user_id'), isFalse);
     });
   });
 }

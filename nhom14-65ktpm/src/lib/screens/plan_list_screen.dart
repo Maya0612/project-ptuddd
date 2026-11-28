@@ -63,7 +63,6 @@ class _PlanListScreenState extends State<PlanListScreen> {
       final now = DateTime.now().toUtc();
       final updatedPlan = PlanModel(
         id: plan?.id ?? '',
-        userId: plan?.userId ?? '',
         personalTopicId: widget.personalTopicId,
         title: result.title,
         description: result.description,
