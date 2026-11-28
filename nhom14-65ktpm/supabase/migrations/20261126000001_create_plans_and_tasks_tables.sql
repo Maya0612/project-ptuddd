@@ -1,5 +1,6 @@
--- Depends on the public.personal_topics table owned by TV4.
--- Apply this migration only after that table exists in the migration history.
+-- Schema proposal for the planning module.
+-- Review with TV1 before applying to the shared Supabase project.
+-- Assumes public.personal_topics.id is a UUID.
 
 create table if not exists public.plans (
   id uuid primary key default gen_random_uuid(),

@@ -33,11 +33,11 @@ Mỗi thành viên làm việc trên branch cá nhân cố định được phâ
 
 | Mã TV | Thành viên | Branch cá nhân | Phạm vi chính |
 |---|---|---|---|
-| TV1 | Đào Hà Thu – Trưởng nhóm | `feature/tv1-foundation-auth` | Kiến trúc, cấu trúc Flutter, kết nối Supabase, Auth, `profiles`, RLS nền tảng, tổng hợp schema và tích hợp |
-| TV2 | Phạm Kim Anh | `feature/tv2-project-repository` | Kho đồ án, `projects`, `fields`, `favorites`, tìm kiếm/lọc, đề xuất bổ sung và quy trình duyệt |
-| TV3 | Trần Đức Trung | `feature/tv3-ai-suggestions` | AI gợi ý 3–5 hướng đề tài, đối chiếu với kho đồ án đã duyệt, tích hợp AI API qua backend/Edge Function |
-| TV4 | Trịnh Mạnh Đức | `feature/tv4-personal-topics` | Quản lý đề tài cá nhân, `personal_topics`, lưu ý tưởng tự tạo hoặc từ AI |
-| TV5 | Vương Tiến Dũng | `feature/tv5-planning-progress` | Lập kế hoạch, `plans`, `tasks`, thời hạn, trạng thái và tiến độ |
+| TV1 | Đào Hà Thu – Trưởng nhóm | `feature/nhom14/foundation-auth` | Kiến trúc, cấu trúc Flutter, kết nối Supabase, Auth, `profiles`, RLS nền tảng, tổng hợp schema và tích hợp |
+| TV2 | Phạm Kim Anh | `feature/nhom14/project-repository` | Kho đồ án, `projects`, `fields`, `favorites`, tìm kiếm/lọc, đề xuất bổ sung và quy trình duyệt |
+| TV3 | Trần Đức Trung | `feature/nhom14/ai-suggestions` | AI gợi ý 3–5 hướng đề tài, đối chiếu với kho đồ án đã duyệt, tích hợp AI API qua backend/Edge Function |
+| TV4 | Trịnh Mạnh Đức | `feature/nhom14/personal-topics` | Quản lý đề tài cá nhân, `personal_topics`, lưu ý tưởng tự tạo hoặc từ AI |
+| TV5 | Vương Tiến Dũng | `feature/nhom14/planning-progress` | Lập kế hoạch, `plans`, `tasks`, thời hạn, trạng thái và tiến độ |
 
 Chi tiết đầu việc và tiêu chí hoàn thành xem trong GitHub Issues được giao cho từng thành viên.
 
@@ -130,6 +130,7 @@ Các bảng dưới đây là **danh sách định hướng**, chưa phải sche
 | `personal_topics` | Đề tài cá nhân của sinh viên | TV4 |
 | `plans` | Kế hoạch chuẩn bị gắn với đề tài cá nhân | TV5 |
 | `tasks` | Công việc thuộc một kế hoạch | TV5 |
+| `ai_suggestions` | Chỉ tạo nếu nhóm thống nhất cần lưu lịch sử gợi ý AI | TV3 phối hợp TV1 |
 
 `auth.users` là bảng do Supabase Auth quản lý, không phải bảng nghiệp vụ do nhóm tự tạo.
 
@@ -212,25 +213,53 @@ project-ptuddd/
 
 Nếu cấu trúc thực tế trong repository khác sơ đồ này, cần đối chiếu với README gốc của giảng viên trước khi di chuyển hoặc tạo thư mục. Không tự ý thay đổi cấu trúc nộp bài do giảng viên quy định.
 
-## 8. Khởi chạy ứng dụng Flutter
+## 8. Cấu hình môi trường và khởi chạy ứng dụng
 
-Mở terminal tại thư mục nhóm rồi chạy:
+### 8.1. Cài đặt các gói phụ thuộc (Dependencies)
+Mở terminal tại thư mục mã nguồn `nhom14-65ktpm/src`:
 
 ```bash
 cd nhom14-65ktpm/src
 flutter pub get
-flutter run
 ```
 
-Nếu đang ở thư mục `nhom14-65ktpm` thì chỉ cần:
+### 8.2. Cấu hình biến môi trường kết nối Supabase (`env.json`)
+Ứng dụng sử dụng tệp `env.json` tại `nhom14-65ktpm/src/env.json` để truyền thông số kết nối vào ứng dụng qua `--dart-define-from-file`:
+
+1. Sao chép từ tệp mẫu:
+   ```bash
+   # Windows PowerShell:
+   Copy-Item env.json.example env.json
+
+   # Linux / macOS / Git Bash:
+   cp env.json.example env.json
+   ```
+2. Mở file `env.json` vừa tạo và điền thông tin Supabase dự án (do Trưởng nhóm TV1 cung cấp nội bộ):
+   ```json
+   {
+     "SUPABASE_URL": "https://<your-project-id>.supabase.co",
+     "SUPABASE_ANON_KEY": "<your-publishable-or-anon-key>"
+   }
+   ```
+   > ⚠️ **Bảo mật:** Tệp `env.json` đã nằm trong `.gitignore`. Tuyệt đối không commit tệp này hoặc đưa khóa bí mật lên repository.
+
+### 8.3. Khởi chạy ứng dụng
+Chạy ứng dụng kèm cờ nạp `env.json`:
 
 ```bash
-cd src
-flutter pub get
-flutter run
+# Khởi chạy trên thiết bị đang kết nối (Android/Windows/Web):
+flutter run --dart-define-from-file=env.json
+
+# Hoặc chỉ định Windows Desktop:
+flutter run -d windows --dart-define-from-file=env.json
 ```
 
-Yêu cầu: đã cài Flutter SDK, Android Studio hoặc thiết bị/giả lập phù hợp. Phiên bản Flutter/Dart và cấu hình môi trường cụ thể cần được ghi nhận trong `danhsachnhom.md` khi nhóm chốt môi trường dùng chung.
+### 8.4. Kiểm thử tự động
+Trước khi commit, thành viên chạy kiểm thử để đảm bảo tính năng nền tảng hoạt động chuẩn xác:
+
+```bash
+flutter test --dart-define-from-file=env.json
+```
 
 ## 9. Bảo mật
 
