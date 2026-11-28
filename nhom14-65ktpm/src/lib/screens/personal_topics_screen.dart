@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/personal_topic_model.dart';
 import '../services/personal_topic_service.dart';
 
@@ -57,11 +57,13 @@ class _PersonalTopicsScreenState extends State<PersonalTopicsScreen> {
 
   Color _getStatusColor(String status) {
     switch (status) {
+      case 'preparing':
+        return Colors.amber.shade800;
       case 'in_progress':
         return Colors.orange;
       case 'completed':
         return Colors.green;
-      case 'idea':
+      case 'exploring':
       default:
         return Colors.blue;
     }
@@ -70,16 +72,22 @@ class _PersonalTopicsScreenState extends State<PersonalTopicsScreen> {
   void _openTopicForm({PersonalTopic? existingTopic}) {
     final isEditing = existingTopic != null;
     final titleCtrl = TextEditingController(text: existingTopic?.title ?? '');
-    final descCtrl = TextEditingController(text: existingTopic?.description ?? '');
-    final objCtrl = TextEditingController(text: existingTopic?.objectives ?? '');
-    final techCtrl = TextEditingController(text: existingTopic?.technologies ?? '');
-    final planCtrl = TextEditingController(text: existingTopic?.implementationPlan ?? '');
+    final objectiveCtrl = TextEditingController(
+      text: existingTopic?.objective ?? '',
+    );
+    final approachCtrl = TextEditingController(
+      text: existingTopic?.approach ?? '',
+    );
+    final techCtrl = TextEditingController(
+      text: existingTopic?.technologies.join(', ') ?? '',
+    );
 
     String? selectedFieldId = existingTopic?.fieldId;
-    if (selectedFieldId != null && !_fields.any((f) => f.id == selectedFieldId)) {
+    if (selectedFieldId != null &&
+        !_fields.any((f) => f.id == selectedFieldId)) {
       selectedFieldId = null;
     }
-    String selectedStatus = existingTopic?.status ?? 'idea';
+    String selectedStatus = existingTopic?.status ?? 'exploring';
     final formKey = GlobalKey<FormState>();
     bool isSaving = false;
 
@@ -110,8 +118,13 @@ class _PersonalTopicsScreenState extends State<PersonalTopicsScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            isEditing ? 'Chỉnh sửa đề tài cá nhân' : 'Thêm đề tài mới',
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            isEditing
+                                ? 'Chỉnh sửa đề tài cá nhân'
+                                : 'Thêm đề tài mới',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           IconButton(
                             icon: const Icon(Icons.close),
@@ -133,7 +146,7 @@ class _PersonalTopicsScreenState extends State<PersonalTopicsScreen> {
                       const SizedBox(height: 12),
                       if (_fields.isNotEmpty) ...[
                         DropdownButtonFormField<String?>(
-                          value: selectedFieldId,
+                          initialValue: selectedFieldId,
                           decoration: const InputDecoration(
                             labelText: 'Lĩnh vực nghiên cứu',
                             border: OutlineInputBorder(),
@@ -150,37 +163,44 @@ class _PersonalTopicsScreenState extends State<PersonalTopicsScreen> {
                               ),
                             ),
                           ],
-                          onChanged: (val) => setModalState(() => selectedFieldId = val),
+                          onChanged: (val) =>
+                              setModalState(() => selectedFieldId = val),
                         ),
                         const SizedBox(height: 12),
                       ],
                       DropdownButtonFormField<String>(
-                        value: selectedStatus,
+                        initialValue: selectedStatus,
                         decoration: const InputDecoration(
                           labelText: 'Trạng thái',
                           border: OutlineInputBorder(),
                         ),
                         items: const [
-                          DropdownMenuItem(value: 'idea', child: Text('Ý tưởng')),
-                          DropdownMenuItem(value: 'in_progress', child: Text('Đang phát triển')),
-                          DropdownMenuItem(value: 'completed', child: Text('Hoàn thành')),
+                          DropdownMenuItem(
+                            value: 'exploring',
+                            child: Text('Ý tưởng'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'preparing',
+                            child: Text('Chuẩn bị'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'in_progress',
+                            child: Text('Đang phát triển'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'completed',
+                            child: Text('Hoàn thành'),
+                          ),
                         ],
                         onChanged: (val) {
-                          if (val != null) setModalState(() => selectedStatus = val);
+                          if (val != null) {
+                            setModalState(() => selectedStatus = val);
+                          }
                         },
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
-                        controller: descCtrl,
-                        maxLines: 2,
-                        decoration: const InputDecoration(
-                          labelText: 'Mô tả chi tiết',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      TextFormField(
-                        controller: objCtrl,
+                        controller: objectiveCtrl,
                         maxLines: 2,
                         decoration: const InputDecoration(
                           labelText: 'Mục tiêu đề tài',
@@ -191,13 +211,14 @@ class _PersonalTopicsScreenState extends State<PersonalTopicsScreen> {
                       TextFormField(
                         controller: techCtrl,
                         decoration: const InputDecoration(
-                          labelText: 'Công nghệ sử dụng (VD: Flutter, Supabase)',
+                          labelText:
+                              'Công nghệ sử dụng (VD: Flutter, Supabase)',
                           border: OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
-                        controller: planCtrl,
+                        controller: approachCtrl,
                         maxLines: 2,
                         decoration: const InputDecoration(
                           labelText: 'Hướng triển khai thực hiện',
@@ -215,352 +236,407 @@ class _PersonalTopicsScreenState extends State<PersonalTopicsScreen> {
                                   if (!formKey.currentState!.validate()) return;
                                   setModalState(() => isSaving = true);
                                   try {
-                                    final userId = Supabase.instance.client.auth.currentUser!.id;
                                     final topicData = PersonalTopic(
                                       id: existingTopic?.id,
-                                      userId: userId,
                                       fieldId: selectedFieldId,
                                       title: titleCtrl.text.trim(),
-                                      description: descCtrl.text.trim().isEmpty ? null : descCtrl.text.trim(),
-                                      objectives: objCtrl.text.trim().isEmpty ? null : objCtrl.text.trim(),
-                                      technologies: techCtrl.text.trim().isEmpty ? null : techCtrl.text.trim(),
-                                      implementationPlan: planCtrl.text.trim().isEmpty ? null : planCtrl.text.trim(),
+                                      objective:
+                                          objectiveCtrl.text.trim().isEmpty
+                                          ? null
+                                          : objectiveCtrl.text.trim(),
+                                      approach: approachCtrl.text.trim().isEmpty
+                                          ? null
+                                          : approachCtrl.text.trim(),
+                                      technologies: techCtrl.text
+                                          .split(',')
+                                          .map(
+                                            (technology) => technology.trim(),
+                                          )
+                                          .where(
+                                            (technology) =>
+                                                technology.isNotEmpty,
+                                          )
+                                          .toList(),
                                       status: selectedStatus,
                                       source: existingTopic?.source ?? 'manual',
                                     );
 
-                                    if (isEditing) {await _service.updateTopic(topicData);
-if (!mounted) return;
-Navigator.pop(ctx);
-_showSnackBar('Đã cập nhật đề tài!');
-} else {
-await _service.createTopic(topicData);
-if (!mounted) return;
-Navigator.pop(ctx);
-_showSnackBar('Đã thêm đề tài mới!');
-}
-_loadInitialData();
-} catch (e) {
-setModalState(() => isSaving = false);
-_showSnackBar('Lỗi lưu đề tài: $e', isError: true);
-}
-},
-child: isSaving
-? const SizedBox(
-width: 22,
-height: 22,
-child: CircularProgressIndicator(strokeWidth: 2),
-)
-: Text(isEditing ? 'Lưu thay đổi' : 'Tạo đề tài'),
-),
-),
-],
-),
-),
-),
-);
-},
-);
-},
-);
-}
-Future _confirmDelete(PersonalTopic topic) async {
-final confirmed = await showDialog(
-context: context,
-builder: (ctx) => AlertDialog(
-title: const Text('Xóa đề tài?'),
-content: Text('Bạn có chắc muốn xóa đề tài "${topic.title}" không?'),
-actions: [
-TextButton(
-onPressed: () => Navigator.pop(ctx, false),
-child: const Text('Hủy'),
-),
-TextButton(
-onPressed: () => Navigator.pop(ctx, true),
-style: TextButton.styleFrom(foregroundColor: Colors.red),
-child: const Text('Xóa'),
-),
-],
-),
-);
-if (confirmed == true && topic.id != null) {
-try {
-await _service.deleteTopic(topic.id!);
-_showSnackBar('Đã xóa đề tài');
-_loadInitialData();
-} catch (e) {
-_showSnackBar('Lỗi khi xóa: $e', isError: true);
-}
-}
-}
-void _showTopicDetail(PersonalTopic topic) {
-showDialog(
-context: context,
-builder: (ctx) => AlertDialog(
-title: Text(topic.title),
-content: SingleChildScrollView(
-child: Column(
-crossAxisAlignment: CrossAxisAlignment.start,
-mainAxisSize: MainAxisSize.min,
-children: [
-_detailRow('Trạng thái:', topic.statusLabel),
-_detailRow(
-'Nguồn tạo:',
-topic.source == 'ai_suggestion' ? 'Lưu từ gợi ý AI' : 'Tự tạo',
-),
-if (topic.fieldName != null) _detailRow('Lĩnh vực:', topic.fieldName!),
-if (topic.description != null) _detailRow('Mô tả:', topic.description!),
-if (topic.objectives != null) _detailRow('Mục tiêu:', topic.objectives!),
-if (topic.technologies != null) _detailRow('Công nghệ:', topic.technologies!),
-if (topic.implementationPlan != null)
-_detailRow('Hướng triển khai:', topic.implementationPlan!),
-],
-),
-),
-actions: [
-TextButton(
-onPressed: () => Navigator.pop(ctx),
-child: const Text('Đóng'),
-),
-ElevatedButton(
-onPressed: () {
-Navigator.pop(ctx);
-_openTopicForm(existingTopic: topic);
-},
-child: const Text('Chỉnh sửa'),
-),
-],
-),
-);
-}
-Widget _detailRow(String label, String value) {
-return Padding(
-padding: const EdgeInsets.only(bottom: 8),
-child: RichText(
-text: TextSpan(
-style: const TextStyle(color: Colors.black87, fontSize: 14),
-children: [
-TextSpan(
-text: '$label ',
-style: const TextStyle(fontWeight: FontWeight.bold),
-),
-TextSpan(text: value),
-],
-),
-),
-);
-}
-@override
-Widget build(BuildContext context) {
-final list = _filteredTopics;
-return Scaffold(
-appBar: AppBar(
-title: const Text('Đề tài cá nhân'),
-actions: [
-IconButton(
-icon: const Icon(Icons.refresh),
-tooltip: 'Làm mới',
-onPressed: _loadInitialData,
-),
-],
-),
-body: Column(
-children: [
-SingleChildScrollView(
-scrollDirection: Axis.horizontal,
-padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-child: Row(
-children: [
-_buildFilterChip('Tất cả', 'all'),
-const SizedBox(width: 8),
-_buildFilterChip('Ý tưởng', 'idea'),
-const SizedBox(width: 8),
-_buildFilterChip('Đang phát triển', 'in_progress'),
-const SizedBox(width: 8),
-_buildFilterChip('Hoàn thành', 'completed'),
-],
-),
-),
-Expanded(
-child: _isLoading
-? const Center(child: CircularProgressIndicator())
-: list.isEmpty
-? Center(
-child: Column(
-mainAxisAlignment: MainAxisAlignment.center,
-children: [
-Icon(Icons.folder_open, size: 64, color: Colors.grey.shade400),
-const SizedBox(height: 12),
-const Text(
-'Chưa có đề tài cá nhân nào',
-style: TextStyle(fontSize: 16, color: Colors.grey),
-),
-const SizedBox(height: 8),
-ElevatedButton.icon(
-onPressed: () => _openTopicForm(),
-icon: const Icon(Icons.add),
-label: const Text('Tạo đề tài đầu tiên'),
-),
-],
-),
-)
-: RefreshIndicator(
-onRefresh: _loadInitialData,
-child: ListView.builder(
-padding: const EdgeInsets.all(12),
-itemCount: list.length,
-itemBuilder: (context, index) {
-final topic = list[index];
-final statusColor = _getStatusColor(topic.status);
-return Card(
-margin: const EdgeInsets.only(bottom: 12),
-elevation: 2,
-shape: RoundedRectangleBorder(
-borderRadius: BorderRadius.circular(12),
-),
-child: InkWell(
-borderRadius: BorderRadius.circular(12),
-onTap: () => _showTopicDetail(topic),
-child: Padding(
-padding: const EdgeInsets.all(14),
-child: Column(
-crossAxisAlignment: CrossAxisAlignment.start,
-children: [
-Row(
-crossAxisAlignment: CrossAxisAlignment.start,
-children: [
-Expanded(
-child: Text(
-topic.title,
-style: const TextStyle(
-fontSize: 16,
-fontWeight: FontWeight.bold,
-),
-),
-),
-PopupMenuButton(
-onSelected: (value) {
-if (value == 'edit') {
-_openTopicForm(existingTopic: topic);
-} else if (value == 'delete') {
-_confirmDelete(topic);
-}
-},
-itemBuilder: (ctx) => const [
-PopupMenuItem(
-value: 'edit',
-child: Row(
-children: [
-Icon(Icons.edit, size: 18),
-SizedBox(width: 8),
-Text('Chỉnh sửa'),
-],
-),
-),
-PopupMenuItem(
-value: 'delete',
-child: Row(
-children: [
-Icon(Icons.delete, size: 18, color: Colors.red),
-SizedBox(width: 8),
-Text('Xóa', style: TextStyle(color: Colors.red)),
-],
-),
-),
-],
-),
-],
-),
-if (topic.description != null &&
-topic.description!.isNotEmpty) ...[
-const SizedBox(height: 6),
-Text(
-topic.description!,
-maxLines: 2,
-overflow: TextOverflow.ellipsis,
-style: TextStyle(color: Colors.grey.shade700),
-),
-],
-const SizedBox(height: 10),
-Wrap(
-spacing: 8,
-runSpacing: 6,
-children: [
-Container(
-padding: const EdgeInsets.symmetric(
-horizontal: 10, vertical: 4),
-decoration: BoxDecoration(
-color: statusColor.withOpacity(0.15),
-borderRadius: BorderRadius.circular(20),
-),
-child: Text(
-topic.statusLabel,
-style: TextStyle(
-color: statusColor,
-fontWeight: FontWeight.w600,
-fontSize: 12,
-),
-),
-),
-Container(
-padding: const EdgeInsets.symmetric(
-horizontal: 10, vertical: 4),
-decoration: BoxDecoration(
-color: topic.source == 'ai_suggestion'
-? Colors.purple.shade50
-: Colors.grey.shade200,
-borderRadius: BorderRadius.circular(20),
-),
-child: Text(
-topic.source == 'ai_suggestion'
-? '✨ Gợi ý AI'
-: '✍️ Tự tạo',
-style: TextStyle(
-color: topic.source == 'ai_suggestion'
-? Colors.purple.shade700
-: Colors.black87,
-fontSize: 12,
-),
-),
-),
-if (topic.fieldName != null)
-Chip(
-label: Text(
-topic.fieldName!,
-style: const TextStyle(fontSize: 12),
-),
-visualDensity: VisualDensity.compact,
-materialTapTargetSize:
-MaterialTapTargetSize.shrinkWrap,
-),
-],
-),
-],
-),
-),
-),
-);
-},
-),
-),
-),
-],
-),
-floatingActionButton: FloatingActionButton.extended(
-onPressed: () => _openTopicForm(),
-icon: const Icon(Icons.add),
-label: const Text('Thêm đề tài'),
-),
-);
-}
-Widget _buildFilterChip(String label, String value) {
-final isSelected = _selectedFilter == value;
-return ChoiceChip(
-label: Text(label),
-selected: isSelected,
-onSelected: (selected) {
-if (selected) setState(() => _selectedFilter = value);
-},
-);
-}
+                                    if (isEditing) {
+                                      await _service.updateTopic(topicData);
+                                      if (!ctx.mounted || !mounted) return;
+                                      Navigator.pop(ctx);
+                                      _showSnackBar('Đã cập nhật đề tài!');
+                                    } else {
+                                      await _service.createTopic(topicData);
+                                      if (!ctx.mounted || !mounted) return;
+                                      Navigator.pop(ctx);
+                                      _showSnackBar('Đã thêm đề tài mới!');
+                                    }
+                                    _loadInitialData();
+                                  } catch (e) {
+                                    if (!ctx.mounted || !mounted) return;
+                                    setModalState(() => isSaving = false);
+                                    _showSnackBar(
+                                      'Lỗi lưu đề tài: $e',
+                                      isError: true,
+                                    );
+                                  }
+                                },
+                          child: isSaving
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(isEditing ? 'Lưu thay đổi' : 'Tạo đề tài'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future _confirmDelete(PersonalTopic topic) async {
+    final confirmed = await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Xóa đề tài?'),
+        content: Text('Bạn có chắc muốn xóa đề tài "${topic.title}" không?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Hủy'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Xóa'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && topic.id != null) {
+      try {
+        await _service.deleteTopic(topic.id!);
+        _showSnackBar('Đã xóa đề tài');
+        _loadInitialData();
+      } catch (e) {
+        _showSnackBar('Lỗi khi xóa: $e', isError: true);
+      }
+    }
+  }
+
+  void _showTopicDetail(PersonalTopic topic) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(topic.title),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _detailRow('Trạng thái:', topic.statusLabel),
+              _detailRow(
+                'Nguồn tạo:',
+                topic.source == 'ai' ? 'Lưu từ gợi ý AI' : 'Tự tạo',
+              ),
+              if (topic.fieldName != null)
+                _detailRow('Lĩnh vực:', topic.fieldName!),
+              if (topic.objective != null)
+                _detailRow('Mục tiêu:', topic.objective!),
+              if (topic.technologies.isNotEmpty)
+                _detailRow('Công nghệ:', topic.technologies.join(', ')),
+              if (topic.approach != null)
+                _detailRow('Hướng triển khai:', topic.approach!),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Đóng'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _openTopicForm(existingTopic: topic);
+            },
+            child: const Text('Chỉnh sửa'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _detailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: RichText(
+        text: TextSpan(
+          style: const TextStyle(color: Colors.black87, fontSize: 14),
+          children: [
+            TextSpan(
+              text: '$label ',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            TextSpan(text: value),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final list = _filteredTopics;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Đề tài cá nhân'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Làm mới',
+            onPressed: _loadInitialData,
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              children: [
+                _buildFilterChip('Tất cả', 'all'),
+                const SizedBox(width: 8),
+                _buildFilterChip('Ý tưởng', 'exploring'),
+                const SizedBox(width: 8),
+                _buildFilterChip('Chuẩn bị', 'preparing'),
+                const SizedBox(width: 8),
+                _buildFilterChip('Đang phát triển', 'in_progress'),
+                const SizedBox(width: 8),
+                _buildFilterChip('Hoàn thành', 'completed'),
+              ],
+            ),
+          ),
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : list.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.folder_open,
+                          size: 64,
+                          color: Colors.grey.shade400,
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Chưa có đề tài cá nhân nào',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton.icon(
+                          onPressed: () => _openTopicForm(),
+                          icon: const Icon(Icons.add),
+                          label: const Text('Tạo đề tài đầu tiên'),
+                        ),
+                      ],
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: _loadInitialData,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(12),
+                      itemCount: list.length,
+                      itemBuilder: (context, index) {
+                        final topic = list[index];
+                        final statusColor = _getStatusColor(topic.status);
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () => _showTopicDetail(topic),
+                            child: Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          topic.title,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      PopupMenuButton(
+                                        onSelected: (value) {
+                                          if (value == 'edit') {
+                                            _openTopicForm(
+                                              existingTopic: topic,
+                                            );
+                                          } else if (value == 'delete') {
+                                            _confirmDelete(topic);
+                                          }
+                                        },
+                                        itemBuilder: (ctx) => const [
+                                          PopupMenuItem(
+                                            value: 'edit',
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.edit, size: 18),
+                                                SizedBox(width: 8),
+                                                Text('Chỉnh sửa'),
+                                              ],
+                                            ),
+                                          ),
+                                          PopupMenuItem(
+                                            value: 'delete',
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.delete,
+                                                  size: 18,
+                                                  color: Colors.red,
+                                                ),
+                                                SizedBox(width: 8),
+                                                Text(
+                                                  'Xóa',
+                                                  style: TextStyle(
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  if (topic.objective != null &&
+                                      topic.objective!.isNotEmpty) ...[
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      topic.objective!,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Colors.grey.shade700,
+                                      ),
+                                    ),
+                                  ],
+                                  const SizedBox(height: 10),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 6,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: statusColor.withOpacity(0.15),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          topic.statusLabel,
+                                          style: TextStyle(
+                                            color: statusColor,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: topic.source == 'ai'
+                                              ? Colors.purple.shade50
+                                              : Colors.grey.shade200,
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          topic.source == 'ai'
+                                              ? '✨ Gợi ý AI'
+                                              : '✍️ Tự tạo',
+                                          style: TextStyle(
+                                            color: topic.source == 'ai'
+                                                ? Colors.purple.shade700
+                                                : Colors.black87,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                      if (topic.fieldName != null)
+                                        Chip(
+                                          label: Text(
+                                            topic.fieldName!,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          visualDensity: VisualDensity.compact,
+                                          materialTapTargetSize:
+                                              MaterialTapTargetSize.shrinkWrap,
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _openTopicForm(),
+        icon: const Icon(Icons.add),
+        label: const Text('Thêm đề tài'),
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String label, String value) {
+    final isSelected = _selectedFilter == value;
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (selected) {
+        if (selected) setState(() => _selectedFilter = value);
+      },
+    );
+  }
 }

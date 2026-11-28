@@ -33,6 +33,15 @@ class _PlanListScreenState extends State<PlanListScreen> {
     _loadPlans();
   }
 
+  @override
+  void didUpdateWidget(covariant PlanListScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.personalTopicId != widget.personalTopicId) {
+      _plans = [];
+      _loadPlans();
+    }
+  }
+
   Future<void> _loadPlans() async {
     setState(() {
       _isLoading = true;

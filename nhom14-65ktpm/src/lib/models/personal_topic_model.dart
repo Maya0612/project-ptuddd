@@ -1,101 +1,99 @@
 class FieldItem {
+  const FieldItem({required this.id, required this.name});
+
   final String id;
   final String name;
-
-  FieldItem({required this.id, required this.name});
 
   factory FieldItem.fromJson(Map<String, dynamic> json) {
     return FieldItem(
       id: json['id'].toString(),
-      name: json['name'] ?? json['title'] ?? 'Chưa đặt tên',
+      name: (json['name'] ?? json['title'] ?? 'Chưa đặt tên').toString(),
     );
   }
 }
 
 class PersonalTopic {
-  final String? id;
-  final String userId;
-  final String? fieldId;
-  final String? fieldName; // Dùng để hiển thị tên lĩnh vực khi join bảng fields
-  final String title;
-  final String? description;
-  final String? objectives;
-  final String? technologies;
-  final String? implementationPlan;
-  final String status; // 'idea', 'in_progress', 'completed'
-  final String source; // 'manual', 'ai_suggestion'
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-
-  PersonalTopic({
+  const PersonalTopic({
     this.id,
-    required this.userId,
     this.fieldId,
     this.fieldName,
     required this.title,
-    this.description,
-    this.objectives,
-    this.technologies,
-    this.implementationPlan,
-    this.status = 'idea',
+    this.objective,
+    this.approach,
+    this.technologies = const [],
+    this.status = 'exploring',
     this.source = 'manual',
     this.createdAt,
     this.updatedAt,
   });
 
+  final String? id;
+  final String? fieldId;
+  final String? fieldName;
+  final String title;
+  final String? objective;
+  final String? approach;
+  final List<String> technologies;
+  final String status;
+  final String source;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
   factory PersonalTopic.fromJson(Map<String, dynamic> json) {
-    String? extractedFieldName;
-    if (json['fields'] != null && json['fields'] is Map) {
-      extractedFieldName = json['fields']['name'] ?? json['fields']['title'];
-    }
+    final fields = json['fields'];
+    final fieldName = fields is Map
+        ? (fields['name'] ?? fields['title'])?.toString()
+        : null;
+    final technologies = json['technologies'] as List<dynamic>? ?? const [];
 
     return PersonalTopic(
       id: json['id']?.toString(),
-      userId: json['user_id'].toString(),
       fieldId: json['field_id']?.toString(),
-      fieldName: extractedFieldName,
-      title: json['title'] ?? '',
-      description: json['description'],
-      objectives: json['objectives'],
-      technologies: json['technologies'],
-      implementationPlan: json['implementation_plan'],
-      status: json['status'] ?? 'idea',
-      source: json['source'] ?? 'manual',
-      createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'])
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'])
-          : null,
+      fieldName: fieldName,
+      title: json['title'] as String? ?? '',
+      objective: json['objective'] as String?,
+      approach: json['approach'] as String?,
+      technologies: technologies.map((value) => value.toString()).toList(),
+      status: json['status'] as String? ?? 'exploring',
+      source: json['source'] as String? ?? 'manual',
+      createdAt: json['created_at'] == null
+          ? null
+          : DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
+          ? null
+          : DateTime.parse(json['updated_at'] as String),
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toInsertJson() {
     return {
-      if (id != null) 'id': id,
-      'user_id': userId,
       'field_id': fieldId,
       'title': title,
-      'description': description,
-      'objectives': objectives,
+      'objective': objective,
+      'approach': approach,
       'technologies': technologies,
-      'implementation_plan': implementationPlan,
       'status': status,
       'source': source,
-      'updated_at': DateTime.now().toIso8601String(),
     };
   }
 
-  // Hàm tiện ích chuyển mã status tiếng Anh sang nhãn tiếng Việt hiển thị trên UI
+  Map<String, dynamic> toUpdateJson() {
+    return {
+      'field_id': fieldId,
+      'title': title,
+      'objective': objective,
+      'approach': approach,
+      'technologies': technologies,
+      'status': status,
+    };
+  }
+
   String get statusLabel {
-    switch (status) {
-      case 'in_progress':
-        return 'Đang phát triển';
-      case 'completed':
-        return 'Hoàn thành';
-      case 'idea':
-      default:
-        return 'Ý tưởng';
-    }
+    return switch (status) {
+      'preparing' => 'Chuẩn bị',
+      'in_progress' => 'Đang phát triển',
+      'completed' => 'Hoàn thành',
+      _ => 'Ý tưởng',
+    };
   }
 }
