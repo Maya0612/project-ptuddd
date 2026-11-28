@@ -197,12 +197,15 @@ project-ptuddd/
 └── nhom14-65ktpm/
     ├── README.md                     # README tổng quan của nhóm
     ├── danhsachnhom.md               # Thành viên, phân công, hướng dẫn môi trường
+    ├── .env.example                  # Mẫu cấu hình Supabase
     ├── docs/
     │   ├── GIT_WORKFLOW.md           # Quy trình Git/GitHub và quy ước database
     │   └── ...                       # Báo cáo và tài liệu thiết kế khác
     ├── supabase/
-    │   ├── config.toml               # Cấu hình Supabase CLI (khi được khởi tạo)
-    │   └── migrations/               # SQL migration được quản lý bằng Git
+    │   ├── migrations/               # SQL migration của schema hiện tại
+    │   └── project-repository/       # Bộ migration kho đồ án được giữ riêng
+    │       ├── migrations/
+    │       └── seed.sql
     └── src/
         ├── android/
         ├── ios/

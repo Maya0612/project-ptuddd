@@ -334,7 +334,12 @@ git push origin <ten-nhom>-<ten-lop>
 ## Khởi tạo cơ sở dữ liệu (Supabase)
 
 1. Tạo project tại https://supabase.com.
-2. Vào SQL Editor, chạy lần lượt các file trong `supabase/migrations/` theo thứ tự tên file.
-3. Chạy `supabase/seed.sql` để có dữ liệu mẫu (dữ liệu giả).
-4. Sao chép `.env.example` thành `.env`, điền `SUPABASE_URL` và `SUPABASE_ANON_KEY` lấy từ Project Settings → API (không commit file `.env`).
-5. Xem sơ đồ và mô tả cơ sở dữ liệu tại [`docs/erd.md`](docs/erd.md).
+2. Vào SQL Editor, chạy lần lượt các file trong `nhom14-65ktpm/supabase/migrations/` theo thứ tự tên file.
+3. Chạy `nhom14-65ktpm/supabase/seed.sql` để có dữ liệu mẫu (dữ liệu giả).
+4. Sao chép `nhom14-65ktpm/.env.example` thành `nhom14-65ktpm/.env`, điền `SUPABASE_URL` và `SUPABASE_ANON_KEY` lấy từ Project Settings → API (không commit file `.env`).
+5. Xem sơ đồ dữ liệu hiện tại tại [`nhom14-65ktpm/docs/erd.md`](nhom14-65ktpm/docs/erd.md).
+
+Bộ migration riêng của kho đồ án được giữ tại
+`nhom14-65ktpm/supabase/project-repository/`; không trộn bộ này vào thư mục
+migration chính vì chúng có version và schema khác nhau. ERD tương ứng được
+lưu tại [`erd-project-repository-legacy.md`](nhom14-65ktpm/docs/erd-project-repository-legacy.md).
