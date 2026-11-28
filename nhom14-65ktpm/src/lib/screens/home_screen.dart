@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/supabase_config.dart';
 import '../core/theme/app_theme.dart';
 import 'module_placeholder_screen.dart';
+import 'ai_suggestion_screen.dart';
 
 /// Mục điều hướng trong khung ứng dụng
 class AppNavItem {
@@ -514,14 +515,7 @@ class _HomeScreenState extends State<HomeScreen> {
           icon: Icons.library_books_rounded,
         );
       case 2:
-        return const ModulePlaceholderScreen(
-          moduleTitle: 'AI gợi ý & đối chiếu đề tài',
-          assignee: 'TV3 – Trần Đức Trung',
-          description:
-              'Phân tích định hướng, nguyện vọng của sinh viên để đề xuất 3-5 đề tài phù hợp. '
-              'Hệ thống tự động đối chiếu với dữ liệu kho đồ án đã duyệt để hạn chế trùng lặp ý tưởng.',
-          icon: Icons.auto_awesome_rounded,
-        );
+        return const AiSuggestionScreen();
       case 3:
         return const ModulePlaceholderScreen(
           moduleTitle: 'Quản lý đề tài cá nhân',
