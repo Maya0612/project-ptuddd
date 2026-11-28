@@ -91,16 +91,22 @@ class SupabaseConfig {
         return {
           'connected': true,
           'needs_migration': true,
-          'message':
-              'Đã kết nối thành công tới máy chủ Supabase! Bảng "profiles" chưa được tạo trên CSDL (hãy chạy file migration SQL trên Supabase Dashboard).',
+          'message': 'Đã kết nối thành công tới máy chủ Supabase! Bảng "profiles" chưa được tạo trên CSDL (hãy chạy file migration SQL trên Supabase Dashboard).',
         };
       }
-      // Mã 42501: permission denied - bảng profiles đã tồn tại và RLS đang chặn truy cập trái phép của người dùng chưa đăng nhập
+      // Mã 42501: permission denied
       if (e.code == '42501') {
+        final hasSession = client.auth.currentSession != null;
+        if (!hasSession) {
+          return {
+            'connected': true,
+            'message': 'Đã kết nối máy chủ Supabase. Bảng profiles có RLS và yêu cầu đăng nhập để truy cập.',
+          };
+        }
         return {
-          'connected': true,
-          'message':
-              'Đã kết nối máy chủ Supabase thành công! Bảng profiles và bảo mật RLS đang hoạt động chuẩn xác.',
+          'connected': false,
+          'error_code': e.code,
+          'message': 'Lỗi thiếu quyền truy cập (42501): Tài khoản hiện tại không có quyền đọc bảng profiles.',
         };
       }
       return {
@@ -109,10 +115,7 @@ class SupabaseConfig {
         'message': 'Lỗi truy vấn Supabase: ${e.message}',
       };
     } catch (e) {
-      return {
-        'connected': false,
-        'message': 'Lỗi kết nối: $e',
-      };
+      return {'connected': false, 'message': 'Lỗi kết nối: $e'};
     }
   }
 }

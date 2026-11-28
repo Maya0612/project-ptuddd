@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../core/supabase_config.dart';
 import '../core/theme/app_theme.dart';
 import 'home_screen.dart';
@@ -49,19 +51,41 @@ class _AuthGateState extends State<AuthGate> {
       return;
     }
 
-    // Đăng ký listener duy nhất theo dõi thay đổi phiên (đăng nhập, đăng xuất, token refresh)
-    _authSubscription = supabase.auth.onAuthStateChange.listen((data) {
-      if (!mounted) return;
-      setState(() {
-        _session = data.session;
-        _isLoading = false;
-      });
+    // Đăng ký listener duy nhất theo dõi thay đổi phiên (đăng nhập, đăng xuất, đổi người dùng)
+    _authSubscription = supabase.auth.onAuthStateChange.listen(
+      (data) {
+        if (!mounted) return;
 
-      // Nếu đang có route phụ/dialog được push phía trên, đóng lại để về root
-      if (mounted && Navigator.of(context).canPop()) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
-      }
-    });
+        final event = data.event;
+        final newSession = data.session;
+
+        // Chỉ điều hướng về root khi thực sự đăng nhập, đăng xuất hoặc đổi tài khoản
+        final shouldResetNavigation =
+            event == AuthChangeEvent.signedIn ||
+            event == AuthChangeEvent.signedOut ||
+            event == AuthChangeEvent.userUpdated ||
+            (_session?.user.id != newSession?.user.id);
+
+        setState(() {
+          _session = newSession;
+          _isLoading = false;
+        });
+
+        if (shouldResetNavigation &&
+            mounted &&
+            Navigator.of(context).canPop()) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+      },
+      onError: (error) {
+        debugPrint('[AuthGate] Lỗi stream onAuthStateChange: $error');
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      },
+    );
 
     // Đọc phiên đăng nhập hiện tại từ bộ nhớ đệm của Supabase Client
     Session? currentSession = supabase.auth.currentSession;
@@ -98,7 +122,8 @@ class _AuthGateState extends State<AuthGate> {
     }
 
     if (_session != null) {
-      return const HomeScreen(
+      return HomeScreen(
+        key: ValueKey(_session!.user.id),
         title: 'HỆ THỐNG HỖ TRỢ ĐỒ ÁN TỐT NGHIỆP CHO SINH VIÊN',
       );
     }
@@ -150,10 +175,7 @@ class SplashLoadingView extends StatelessWidget {
             const SizedBox(height: 8),
             const Text(
               'Đang kiểm tra phiên đăng nhập...',
-              style: TextStyle(
-                fontSize: 13,
-                color: AppColors.textSecondary,
-              ),
+              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 24),
             const SizedBox(
