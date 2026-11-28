@@ -95,7 +95,9 @@ class _AuthGateState extends State<AuthGate> {
       try {
         final res = await supabase.auth.refreshSession();
         currentSession = res.session;
-      } catch (_) {
+      } catch (error, stackTrace) {
+        debugPrint('[AuthGate] Session refresh failed: $error');
+        debugPrint('$stackTrace');
         currentSession = null;
       }
     }

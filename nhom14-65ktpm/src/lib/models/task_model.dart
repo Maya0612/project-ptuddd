@@ -25,7 +25,6 @@ class TaskModel {
   const TaskModel({
     required this.id,
     required this.planId,
-    required this.userId,
     required this.title,
     required this.phase,
     this.description,
@@ -39,9 +38,8 @@ class TaskModel {
 
   final String id;
   final String planId;
-  final String userId;
   final String title;
-  final String phase;
+  final String? phase;
   final String? description;
   final DateTime? dueDate;
   final TaskStatus status;
@@ -57,9 +55,8 @@ class TaskModel {
     return TaskModel(
       id: json['id'] as String,
       planId: json['plan_id'] as String,
-      userId: json['user_id'] as String,
       title: json['title'] as String,
-      phase: json['phase'] as String,
+      phase: json['phase'] as String?,
       description: json['description'] as String?,
       dueDate: dueDate == null ? null : DateTime.parse(dueDate),
       status: TaskStatus.fromDatabaseValue(json['status'] as String),
@@ -74,7 +71,6 @@ class TaskModel {
     return {
       'id': id,
       'plan_id': planId,
-      'user_id': userId,
       'title': title,
       'phase': phase,
       'description': description,

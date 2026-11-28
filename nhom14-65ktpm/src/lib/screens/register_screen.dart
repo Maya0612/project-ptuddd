@@ -39,31 +39,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   /// Chuyển đổi mã lỗi kỹ thuật từ Supabase thành thông điệp thân thiện với người dùng
-  String _getReadableErrorMessage(dynamic error) {
+  String _getReadableErrorMessage(Object error) {
+    final detail = error is AuthException
+        ? error.message
+        : error is PostgrestException
+        ? error.message
+        : error.toString();
+    debugPrint('[RegisterScreen] Authentication error: $detail');
+
+    String? friendlyMessage;
     if (error is AuthException) {
-      final msg = error.message.toLowerCase();
+      final msg = detail.toLowerCase();
       if (msg.contains('user already registered') ||
           msg.contains('already exists') ||
           msg.contains('unique constraint')) {
-        return 'Email này đã được đăng ký. Vui lòng sử dụng email khác hoặc đăng nhập.';
+        friendlyMessage = 'Email này đã được đăng ký. Vui lòng sử dụng email khác hoặc đăng nhập.';
       } else if (msg.contains('password') && msg.contains('least')) {
-        return 'Mật khẩu phải có ít nhất 6 ký tự.';
+        friendlyMessage = 'Mật khẩu phải có ít nhất 6 ký tự.';
       } else if (msg.contains('too many requests') ||
           msg.contains('rate limit')) {
-        return 'Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau ít phút.';
+        friendlyMessage =
+            'Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau ít phút.';
       }
-      return 'Đăng ký không thành công: ${error.message}';
+    } else {
+      final errStr = detail.toLowerCase();
+      if (errStr.contains('socketexception') ||
+          errStr.contains('network') ||
+          errStr.contains('failed host lookup') ||
+          errStr.contains('clientexception')) {
+        friendlyMessage = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.';
+      }
     }
 
-    final errStr = error.toString().toLowerCase();
-    if (errStr.contains('socketexception') ||
-        errStr.contains('network') ||
-        errStr.contains('failed host lookup') ||
-        errStr.contains('clientexception')) {
-      return 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.';
-    }
-
-    return 'Đã có lỗi xảy ra trong quá trình đăng ký. Vui lòng thử lại sau.';
+    final prefix = friendlyMessage ?? 'Đăng ký không thành công.';
+    return '$prefix\nChi tiết lỗi: $detail';
   }
 
   void _showErrorSnackBar(String message) {
@@ -78,7 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         backgroundColor: AppColors.danger,
         behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 4),
+        duration: const Duration(seconds: 8),
       ),
     );
   }

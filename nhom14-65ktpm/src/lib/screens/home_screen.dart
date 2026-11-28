@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/supabase_config.dart';
 import '../core/theme/app_theme.dart';
 import 'module_placeholder_screen.dart';
+import 'planning_tab_screen.dart';
 import 'project_repository_screen.dart';
 
 /// Mục điều hướng trong khung ứng dụng
@@ -504,7 +505,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(width: 12),
                   const Expanded(
                     child: Text(
-                      'HỖ TRỢ ĐỒ ÁN',
+                      'TLU - ĐỒ ÁN TỐT NGHIỆP',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
@@ -785,14 +786,7 @@ class _HomeScreenState extends State<HomeScreen> {
             'Kế hoạch & tiến độ thực hiện',
           );
         }
-        return const ModulePlaceholderScreen(
-          moduleTitle: 'Kế hoạch & tiến độ thực hiện',
-          assignee: 'TV5 – Vương Tiến Dũng',
-          description:
-              'Xây dựng kế hoạch chi tiết, phân chia các đầu việc, đặt thời hạn '
-              'và theo dõi tiến độ hoàn thành các giai đoạn của đồ án tốt nghiệp.',
-          icon: Icons.calendar_month_rounded,
-        );
+        return const PlanningTabScreen();
       case 6:
         if (role != 'admin' && role != 'lecturer') {
           return _buildOverviewTab();

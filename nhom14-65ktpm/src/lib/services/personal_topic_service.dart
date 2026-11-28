@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/personal_topic_model.dart';
 
 class PersonalTopicService {
@@ -12,41 +13,43 @@ class PersonalTopicService {
     return user.id;
   }
 
+  void _requireSignedInUser() {
+    if (_supabase.auth.currentUser == null) {
+      throw StateError('Người dùng chưa đăng nhập hệ thống.');
+    }
+  }
+
   // 0. Lấy danh sách lĩnh vực từ bảng fields để hiển thị trong Dropdown
   Future<List<FieldItem>> fetchFields() async {
-    try {
-      final response = await _supabase.from('fields').select();
-      return (response as List)
-          .map((json) => FieldItem.fromJson(json))
-          .toList();
-    } catch (e) {
-      return [];
-    }
+    final response = await _supabase.from('fields').select();
+    return response
+        .map((json) => FieldItem.fromJson(Map<String, dynamic>.from(json)))
+        .toList();
   }
 
   // 1. Lấy danh sách toàn bộ đề tài cá nhân (kèm tên lĩnh vực nếu có)
   Future<List<PersonalTopic>> fetchPersonalTopics() async {
     final response = await _supabase
         .from('personal_topics')
-        .select(', fields()')
+        .select('*, fields(name)')
         .eq('user_id', _currentUserId)
         .order('created_at', ascending: false);
 
-    return (response as List)
-        .map((json) => PersonalTopic.fromJson(json))
+    return response
+        .map((json) => PersonalTopic.fromJson(Map<String, dynamic>.from(json)))
         .toList();
   }
 
   // 2. Thêm đề tài mới từ ý tưởng cá nhân (Tự nhập)
   Future<PersonalTopic> createTopic(PersonalTopic topic) async {
-    final data = topic.toJson();
-    data['user_id'] = _currentUserId;
+    _requireSignedInUser();
+    final data = topic.toInsertJson();
     data['source'] = 'manual';
 
     final response = await _supabase
         .from('personal_topics')
         .insert(data)
-        .select(', fields()')
+        .select('*, fields(name)')
         .single();
 
     return PersonalTopic.fromJson(response);
@@ -55,28 +58,26 @@ class PersonalTopicService {
   // 3. Lưu gợi ý từ AI (phối hợp với TV3) thành đề tài cá nhân
   Future<PersonalTopic> saveFromAiSuggestion({
     required String title,
-    String? description,
-    String? objectives,
+    String? objective,
+    String? approach,
     String? fieldId,
-    String? technologies,
-    String? implementationPlan,
+    List<String> technologies = const [],
   }) async {
-    final data = {
-      'user_id': _currentUserId,
+    _requireSignedInUser();
+    final data = <String, dynamic>{
       'field_id': fieldId,
       'title': title,
-      'description': description,
-      'objectives': objectives,
+      'objective': objective,
+      'approach': approach,
       'technologies': technologies,
-      'implementation_plan': implementationPlan,
-      'status': 'idea',
-      'source': 'ai_suggestion',
+      'status': 'exploring',
+      'source': 'ai',
     };
 
     final response = await _supabase
         .from('personal_topics')
         .insert(data)
-        .select(', fields()')
+        .select('*, fields(name)')
         .single();
 
     return PersonalTopic.fromJson(response);
@@ -87,7 +88,7 @@ class PersonalTopicService {
     if (topic.id == null) return;
     await _supabase
         .from('personal_topics')
-        .update(topic.toJson())
+        .update(topic.toUpdateJson())
         .eq('id', topic.id!)
         .eq('user_id', _currentUserId);
   }

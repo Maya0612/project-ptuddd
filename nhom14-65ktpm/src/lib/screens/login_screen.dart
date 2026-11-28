@@ -34,34 +34,43 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   /// Chuyển đổi mã lỗi kỹ thuật từ Supabase / Network thành thông điệp thân thiện với người dùng
-  String _getReadableErrorMessage(dynamic error) {
+  String _getReadableErrorMessage(Object error) {
+    final detail = error is AuthException
+        ? error.message
+        : error is PostgrestException
+        ? error.message
+        : error.toString();
+    debugPrint('[LoginScreen] Authentication error: $detail');
+
+    String? friendlyMessage;
     if (error is AuthException) {
-      final msg = error.message.toLowerCase();
-      // Ưu tiên kiểm tra lỗi email chưa xác nhận và rate limit trước lỗi credentials chung
+      final msg = detail.toLowerCase();
       if (msg.contains('email not confirmed') ||
           msg.contains('email_not_confirmed')) {
-        return 'Tài khoản chưa được kích hoạt qua email. Vui lòng kiểm tra hộp thư.';
+        friendlyMessage = 'Tài khoản chưa được kích hoạt qua email. Vui lòng kiểm tra hộp thư.';
       } else if (msg.contains('too many requests') ||
           msg.contains('rate limit') ||
           error.statusCode == '429') {
-        return 'Bạn đã thử đăng nhập quá nhiều lần. Vui lòng thử lại sau ít phút.';
+        friendlyMessage =
+            'Bạn đã thử đăng nhập quá nhiều lần. Vui lòng thử lại sau ít phút.';
       } else if (msg.contains('invalid login credentials') ||
           msg.contains('invalid_credentials') ||
           (error.statusCode == '400' && msg.contains('grant_type'))) {
-        return 'Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.';
+        friendlyMessage =
+            'Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.';
       }
-      return 'Đăng nhập không thành công: ${error.message}';
+    } else {
+      final errStr = detail.toLowerCase();
+      if (errStr.contains('socketexception') ||
+          errStr.contains('network') ||
+          errStr.contains('failed host lookup') ||
+          errStr.contains('clientexception')) {
+        friendlyMessage = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.';
+      }
     }
 
-    final errStr = error.toString().toLowerCase();
-    if (errStr.contains('socketexception') ||
-        errStr.contains('network') ||
-        errStr.contains('failed host lookup') ||
-        errStr.contains('clientexception')) {
-      return 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.';
-    }
-
-    return 'Đã có lỗi xảy ra trong quá trình đăng nhập. Vui lòng thử lại sau.';
+    final prefix = friendlyMessage ?? 'Đăng nhập không thành công.';
+    return '$prefix\nChi tiết lỗi: $detail';
   }
 
   void _showErrorSnackBar(String message) {
@@ -76,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         backgroundColor: AppColors.danger,
         behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 4),
+        duration: const Duration(seconds: 8),
       ),
     );
   }

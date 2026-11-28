@@ -45,10 +45,10 @@ void main() {
 
       // 2. Kiểm tra khu vực tổng quan (các thẻ thống kê với giá trị 0 mặc định)
       expect(find.text('Tổng quan đồ án'), findsOneWidget);
-      expect(find.text('Đề tài kho đồ án'), findsOneWidget);
-      expect(find.text('Đề tài đã lưu'), findsOneWidget);
+      expect(find.text('Đồ án đã công bố'), findsOneWidget);
+      expect(find.text('Đồ án yêu thích'), findsOneWidget);
       expect(find.text('Tiến độ hoàn thành'), findsOneWidget);
-      expect(find.text('0%'), findsOneWidget);
+      expect(find.text('—'), findsNWidgets(4));
 
       // 3. Kiểm tra khu vực truy cập nhanh gồm 5 module dành cho student
       expect(find.text('Truy cập nhanh'), findsOneWidget);
@@ -60,7 +60,11 @@ void main() {
 
       // 4. Kiểm tra khu vực hoạt động gần đây (trạng thái trống)
       expect(find.text('Hoạt động gần đây'), findsOneWidget);
-      expect(find.text('Chưa có hoạt động nào gần đây'), findsOneWidget);
+      expect(find.text('Hoạt động chưa được cập nhật'), findsOneWidget);
+      expect(
+        find.text('Chưa tích hợp dữ liệu hoạt động gần đây.'),
+        findsOneWidget,
+      );
 
       // 5. Kiểm tra điều hướng: Bấm vào module 'AI gợi ý đề tài'
       await tester.tap(find.text('AI gợi ý đề tài'));
@@ -147,9 +151,9 @@ void main() {
         ),
       );
 
-      // Hiển thị Tổng quan, Kho đồ án, Hồ sơ
+      // Hiển thị Tổng quan, Quản lý kho đồ án, Hồ sơ
       expect(find.text('Tổng quan'), findsWidgets);
-      expect(find.text('Kho đồ án'), findsWidgets);
+      expect(find.text('Quản lý kho đồ án'), findsWidgets);
       expect(find.text('Hồ sơ'), findsOneWidget);
 
       // Ẩn các module riêng của student khỏi sidebar và truy cập nhanh
@@ -160,10 +164,10 @@ void main() {
       expect(find.text('Kế hoạch & tiến độ'), findsNothing);
 
       // Kiểm tra truy cập kho đồ án của lecturer
-      await tester.tap(find.text('Kho & Quản lý kho'));
+      await tester.tap(find.text('Quản lý kho đồ án').first);
       await tester.pumpAndSettle();
 
-      expect(find.text('Kho đồ án & Quản lý kho'), findsWidgets);
+      expect(find.text('Quản lý kho đồ án'), findsWidgets);
       expect(find.text('AI gợi ý & đối chiếu đề tài'), findsNothing);
     },
   );
@@ -186,9 +190,9 @@ void main() {
         ),
       );
 
-      // Hiển thị Tổng quan, Kho đồ án, Hồ sơ
+      // Hiển thị Tổng quan, Quản lý kho đồ án, Hồ sơ
       expect(find.text('Tổng quan'), findsWidgets);
-      expect(find.text('Kho đồ án'), findsWidgets);
+      expect(find.text('Quản lý kho đồ án'), findsWidgets);
       expect(find.text('Hồ sơ'), findsOneWidget);
 
       // Ẩn các module riêng của student

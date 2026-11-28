@@ -20,7 +20,6 @@ enum PlanStatus {
 class PlanModel {
   const PlanModel({
     required this.id,
-    required this.userId,
     required this.personalTopicId,
     required this.title,
     this.description,
@@ -33,7 +32,6 @@ class PlanModel {
   });
 
   final String id;
-  final String userId;
   final String personalTopicId;
   final String title;
   final String? description;
@@ -56,7 +54,6 @@ class PlanModel {
 
     return PlanModel(
       id: json['id'] as String,
-      userId: json['user_id'] as String,
       personalTopicId: json['personal_topic_id'] as String,
       title: json['title'] as String,
       description: json['description'] as String?,
@@ -81,7 +78,6 @@ class PlanModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'user_id': userId,
       'personal_topic_id': personalTopicId,
       'title': title,
       'description': description,
