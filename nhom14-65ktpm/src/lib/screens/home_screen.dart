@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../core/supabase_config.dart';
 import '../core/theme/app_theme.dart';
 import 'module_placeholder_screen.dart';
+import 'planning_tab_screen.dart';
 
 /// Mục điều hướng trong khung ứng dụng
 class AppNavItem {
@@ -36,15 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoggingOut = false;
 
   Map<String, dynamic>? _userProfile;
-  bool _isProfileLoading = false;
-  bool _isEditingProfile = false;
-  bool _isSavingProfile = false;
-
-  final _profileFormKey = GlobalKey<FormState>();
-  late final TextEditingController _fullNameController;
-  late final TextEditingController _studentCodeController;
-  late final TextEditingController _classNameController;
-  late final TextEditingController _majorController;
 
   static const List<AppNavItem> _navItems = [
     AppNavItem(
@@ -82,44 +75,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _fullNameController = TextEditingController();
-    _studentCodeController = TextEditingController();
-    _classNameController = TextEditingController();
-    _majorController = TextEditingController();
     _fetchUserProfile();
-  }
-
-  @override
-  void dispose() {
-    _fullNameController.dispose();
-    _studentCodeController.dispose();
-    _classNameController.dispose();
-    _majorController.dispose();
-    super.dispose();
-  }
-
-  void _populateProfileControllers() {
-    final meta = supabase.auth.currentUser?.userMetadata;
-    _fullNameController.text = _userProfile?['full_name'] as String? ??
-        meta?['full_name'] as String? ??
-        '';
-    _studentCodeController.text = _userProfile?['student_code'] as String? ??
-        meta?['student_code'] as String? ??
-        '';
-    _classNameController.text = _userProfile?['class_name'] as String? ??
-        meta?['class_name'] as String? ??
-        '';
-    _majorController.text = _userProfile?['major'] as String? ??
-        meta?['major'] as String? ??
-        '';
   }
 
   Future<void> _fetchUserProfile() async {
     if (!SupabaseConfig.isInitialized) return;
-
-    setState(() {
-      _isProfileLoading = true;
-    });
 
     try {
       final user = supabase.auth.currentUser;
@@ -134,104 +94,9 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() {
             _userProfile = data;
           });
-          _populateProfileControllers();
         }
       }
-    } catch (_) {
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isProfileLoading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _handleSaveProfile() async {
-    if (!_profileFormKey.currentState!.validate()) return;
-    if (!SupabaseConfig.isInitialized) return;
-
-    final user = supabase.auth.currentUser;
-    if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Không tìm thấy phiên đăng nhập. Vui lòng thử lại.'),
-          backgroundColor: AppColors.danger,
-        ),
-      );
-      return;
-    }
-
-    setState(() {
-      _isSavingProfile = true;
-    });
-
-    final updatedFullName = _fullNameController.text.trim();
-    final updatedStudentCode = _studentCodeController.text.trim();
-    final updatedClassName = _classNameController.text.trim();
-    final updatedMajor = _majorController.text.trim();
-
-    try {
-      final updateData = {
-        'full_name': updatedFullName.isEmpty ? null : updatedFullName,
-        'student_code': updatedStudentCode.isEmpty ? null : updatedStudentCode,
-        'class_name': updatedClassName.isEmpty ? null : updatedClassName,
-        'major': updatedMajor.isEmpty ? null : updatedMajor,
-        'updated_at': DateTime.now().toIso8601String(),
-      };
-
-      await supabase.from('profiles').update(updateData).eq('id', user.id);
-
-      // Đồng bộ lại dữ liệu mới nhất
-      await _fetchUserProfile();
-
-      if (!mounted) return;
-
-      setState(() {
-        _isEditingProfile = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
-              SizedBox(width: 10),
-              Text('Cập nhật thông tin hồ sơ thành công!'),
-            ],
-          ),
-          backgroundColor: AppColors.primaryAction,
-          duration: Duration(seconds: 2),
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.error_outline, color: Colors.white, size: 20),
-              const SizedBox(width: 10),
-              Expanded(child: Text('Lưu thông tin thất bại: $e')),
-            ],
-          ),
-          backgroundColor: AppColors.danger,
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSavingProfile = false;
-        });
-      }
-    }
-  }
-
-  void _handleCancelEdit() {
-    _populateProfileControllers();
-    setState(() {
-      _isEditingProfile = false;
-    });
+    } catch (_) {}
   }
 
   Future<void> _handleSignOut() async {
@@ -425,7 +290,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(width: 12),
                   const Expanded(
                     child: Text(
-                      'HỖ TRỢ ĐỒ ÁN',
+                      'TLU - ĐỒ ÁN TỐT NGHIỆP',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
@@ -669,14 +534,7 @@ class _HomeScreenState extends State<HomeScreen> {
           icon: Icons.assignment_rounded,
         );
       case 4:
-        return const ModulePlaceholderScreen(
-          moduleTitle: 'Kế hoạch & tiến độ thực hiện',
-          assignee: 'TV5 – Vương Tiến Dũng',
-          description:
-              'Xây dựng kế hoạch chi tiết, phân chia các đầu việc, đặt thời hạn '
-              'và theo dõi tiến độ hoàn thành các giai đoạn của đồ án tốt nghiệp.',
-          icon: Icons.calendar_month_rounded,
-        );
+        return const PlanningTabScreen();
       case 5:
         return _buildProfileTab();
       default:
@@ -1179,14 +1037,14 @@ class _HomeScreenState extends State<HomeScreen> {
         'Chưa cập nhật';
     final studentCode = _userProfile?['student_code'] as String? ?? 'Chưa cập nhật';
     final className = _userProfile?['class_name'] as String? ?? 'Chưa cập nhật';
-    final major = _userProfile?['major'] as String? ?? 'Chưa cập nhật';
+    final major = _userProfile?['major'] as String? ?? 'Công nghệ phần mềm';
     final role = _userProfile?['role'] as String? ?? 'student';
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(28.0),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 580),
+          constraints: const BoxConstraints(maxWidth: 540),
           child: Container(
             padding: const EdgeInsets.all(24.0),
             decoration: BoxDecoration(
@@ -1194,316 +1052,99 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: AppColors.border, width: 1),
             ),
-            child: _isProfileLoading && _userProfile == null
-                ? const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 40.0),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: AppColors.primaryAction,
-                      ),
-                    ),
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 52,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryBackground,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(
-                              Icons.person_rounded,
-                              size: 28,
-                              color: AppColors.primaryAction,
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  userFullName,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  userEmail,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (!_isEditingProfile)
-                            FilledButton.tonalIcon(
-                              onPressed: () {
-                                _populateProfileControllers();
-                                setState(() {
-                                  _isEditingProfile = true;
-                                });
-                              },
-                              icon: const Icon(Icons.edit_rounded, size: 16),
-                              label: const Text('Chỉnh sửa'),
-                              style: FilledButton.styleFrom(
-                                backgroundColor: AppColors.primaryBackground,
-                                foregroundColor: AppColors.primaryAction,
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      const Divider(height: 1, color: AppColors.border),
-                      const SizedBox(height: 14),
-
-                      if (_isEditingProfile)
-                        _buildProfileEditForm(userEmail, role)
-                      else
-                        _buildProfileViewDetails(
-                          userEmail: userEmail,
-                          role: role,
-                          studentCode: studentCode,
-                          className: className,
-                          major: major,
-                        ),
-
-                      const SizedBox(height: 24),
-                      const Divider(height: 1, color: AppColors.border),
-                      const SizedBox(height: 20),
-
-                      // Nút Đăng xuất
-                      SizedBox(
-                        width: double.infinity,
-                        height: 42,
-                        child: OutlinedButton.icon(
-                          onPressed: _isLoggingOut ? null : _handleSignOut,
-                          icon: _isLoggingOut
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppColors.danger,
-                                  ),
-                                )
-                              : const Icon(Icons.logout_rounded, color: AppColors.danger, size: 18),
-                          label: Text(
-                            _isLoggingOut ? 'Đang đăng xuất...' : 'Đăng xuất tài khoản',
-                            style: const TextStyle(
-                              color: AppColors.danger,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
-                            ),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(
-                              color: AppColors.danger,
-                              width: 1.2,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileViewDetails({
-    required String userEmail,
-    required String role,
-    required String studentCode,
-    required String className,
-    required String major,
-  }) {
-    return Column(
-      children: [
-        _buildProfileInfoRow('Email (chỉ xem)', userEmail),
-        _buildProfileInfoRow('Vai trò (chỉ xem)', role.toUpperCase()),
-        _buildProfileInfoRow('Mã sinh viên', studentCode),
-        _buildProfileInfoRow('Lớp sinh hoạt', className),
-        _buildProfileInfoRow('Chuyên ngành', major),
-      ],
-    );
-  }
-
-  Widget _buildProfileEditForm(String userEmail, String role) {
-    return Form(
-      key: _profileFormKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Trường chỉ đọc (Email & Role)
-          _buildReadOnlyField(
-            label: 'Email (chỉ xem)',
-            value: userEmail,
-            icon: Icons.email_outlined,
-          ),
-          const SizedBox(height: 14),
-          _buildReadOnlyField(
-            label: 'Vai trò (chỉ xem)',
-            value: role.toUpperCase(),
-            icon: Icons.shield_outlined,
-          ),
-          const SizedBox(height: 18),
-          const Divider(height: 1, color: AppColors.border),
-          const SizedBox(height: 18),
-
-          // Trường Họ và tên
-          TextFormField(
-            controller: _fullNameController,
-            decoration: const InputDecoration(
-              labelText: 'Họ và tên *',
-              hintText: 'Nhập họ và tên',
-              prefixIcon: Icon(Icons.badge_outlined),
-            ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Họ và tên không được để trống';
-              }
-              if (value.trim().length < 2) {
-                return 'Họ và tên phải có ít nhất 2 ký tự';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 14),
-
-          // Trường Mã sinh viên
-          TextFormField(
-            controller: _studentCodeController,
-            decoration: const InputDecoration(
-              labelText: 'Mã sinh viên',
-              hintText: 'Ví dụ: 2151060000',
-              prefixIcon: Icon(Icons.numbers_rounded),
-            ),
-            validator: (value) {
-              if (value != null && value.trim().isNotEmpty) {
-                if (value.trim().length < 3) {
-                  return 'Mã sinh viên không hợp lệ (tối thiểu 3 ký tự)';
-                }
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 14),
-
-          // Trường Lớp sinh hoạt
-          TextFormField(
-            controller: _classNameController,
-            decoration: const InputDecoration(
-              labelText: 'Lớp sinh hoạt',
-              hintText: 'Ví dụ: 65KTPM',
-              prefixIcon: Icon(Icons.class_outlined),
-            ),
-          ),
-          const SizedBox(height: 14),
-
-          // Trường Chuyên ngành
-          TextFormField(
-            controller: _majorController,
-            decoration: const InputDecoration(
-              labelText: 'Chuyên ngành',
-              hintText: 'Ví dụ: Kỹ thuật phần mềm',
-              prefixIcon: Icon(Icons.school_outlined),
-            ),
-          ),
-          const SizedBox(height: 22),
-
-          // Hàng nút Lưu & Hủy
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: _isSavingProfile ? null : _handleCancelEdit,
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  child: const Text('Hủy'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilledButton(
-                  onPressed: _isSavingProfile ? null : _handleSaveProfile,
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  child: _isSavingProfile
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('Lưu thông tin'),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildReadOnlyField({
-    required String label,
-    required String value,
-    required IconData icon,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceAlt,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: AppColors.textSecondary),
-          const SizedBox(width: 12),
-          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.textSecondary,
-                  ),
+                Row(
+                  children: [
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryBackground,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.person_rounded,
+                        size: 28,
+                        color: AppColors.primaryAction,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            userFullName,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            userEmail,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                const SizedBox(height: 20),
+                const Divider(height: 1, color: AppColors.border),
+                const SizedBox(height: 14),
+
+                _buildProfileInfoRow('Vai trò', role.toUpperCase()),
+                _buildProfileInfoRow('Mã sinh viên', studentCode),
+                _buildProfileInfoRow('Lớp sinh hoạt', className),
+                _buildProfileInfoRow('Chuyên ngành', major),
+
+                const SizedBox(height: 24),
+                const Divider(height: 1, color: AppColors.border),
+                const SizedBox(height: 20),
+
+                // Nút Đăng xuất
+                SizedBox(
+                  width: double.infinity,
+                  height: 42,
+                  child: OutlinedButton.icon(
+                    onPressed: _isLoggingOut ? null : _handleSignOut,
+                    icon: _isLoggingOut
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.danger,
+                            ),
+                          )
+                        : const Icon(Icons.logout_rounded, color: AppColors.danger, size: 18),
+                    label: Text(
+                      _isLoggingOut ? 'Đang đăng xuất...' : 'Đăng xuất tài khoản',
+                      style: const TextStyle(
+                        color: AppColors.danger,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(
+                        color: AppColors.danger,
+                        width: 1.2,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          const Icon(Icons.lock_outline_rounded, size: 16, color: AppColors.textSecondary),
-        ],
+        ),
       ),
     );
   }
