@@ -6,11 +6,11 @@ import '../core/theme/app_theme.dart';
 import 'register_screen.dart';
 
 /// Màn hình đăng nhập sử dụng Email và Password với Supabase Auth.
-/// Tuân thủ hệ thống màu chuẩn hóa:
-/// - Primary background: #EBEAFF
-/// - Secondary: #9694FF
-/// - Primary action: #3D3BF3
-/// - Danger/error: #FF2929
+/// Tuân thủ hệ thống màu Burgundy chuyên nghiệp:
+/// - Primary: #9F1239 (Burgundy)
+/// - Primary Light: #FFF5F5
+/// - Secondary: #E8B4BC
+/// - Danger/error: #DC2626
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -145,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surfaceAlt,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -173,13 +173,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: 56,
                           height: 56,
                           decoration: BoxDecoration(
-                            color: AppColors.primaryBackground,
+                            color: AppColors.primaryLight,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
                             Icons.school_rounded,
                             size: 30,
-                            color: AppColors.primaryAction,
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
@@ -278,7 +278,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: FilledButton(
                           onPressed: _isLoading ? null : _handleLogin,
                           style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.primaryAction,
+                            backgroundColor: AppColors.primary,
                             foregroundColor: AppColors.textLight,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -327,7 +327,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     );
                                   },
                             style: TextButton.styleFrom(
-                              foregroundColor: AppColors.primaryAction,
+                              foregroundColor: AppColors.primary,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 4,
                               ),

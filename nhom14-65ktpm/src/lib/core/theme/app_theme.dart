@@ -1,37 +1,54 @@
 import 'package:flutter/material.dart';
 
-/// Hệ thống màu chuẩn hóa và phối màu trung tính cao cấp của ứng dụng:
-/// 
-/// 4 mã màu thương hiệu bắt buộc:
-/// - [primaryBackground]: #EBEAFF (Chỉ dùng làm nền nhấn nhẹ, badge, icon container)
-/// - [secondary]: #9694FF (Dùng cho đường viền tinh tế, icon phụ, trạng thái tương tác)
-/// - [primaryAction]: #3D3BF3 (Hành động chính, nút bấm, điểm nhấn phân cấp; không phủ kín diện tích lớn)
-/// - [danger]: #FF2929 (Cảnh báo, lỗi, hành động nguy hiểm/đăng xuất)
-/// 
+/// Hệ thống màu Burgundy chuyên nghiệp của ứng dụng:
+///
+/// Bảng màu thương hiệu Burgundy:
+/// - [primary]:      #9F1239  Hành động chính, nút bấm, điểm nhấn phân cấp
+/// - [deep]:         #500724  Sidebar đậm, header nền tối
+/// - [secondary]:    #E8B4BC  Viền tinh tế, icon phụ, trạng thái tương tác
+/// - [primaryLight]: #FFF5F5  Nền nhấn nhẹ, badge, icon container
+/// - [accent]:       #D4A373  Điểm nhấn vàng nâu hợp lý
+///
 /// Màu trung tính chuyên nghiệp:
-/// - [surface]: #FFFFFF (Bề mặt chính cho Scaffold, Card, Sidebar, Dialog)
-/// - [surfaceAlt]: #F9F9FD (Bề mặt phụ siêu nhẹ giúp tạo chiều sâu nhẹ nhàng)
-/// - [textPrimary]: #25234A (Tiêu đề, chữ đậm chính, độ tương phản cao, dễ đọc)
-/// - [textSecondary]: #6B6985 (Nội dung phụ, nhãn, mô tả)
-/// - [textLight]: #FFFFFF (Chữ trắng trên nút/nền đậm)
-/// - [border]: #E2E1F8 (Đường viền mỏng tinh tế, nhẹ nhàng hơn)
+/// - [background]:      #FAF7F7  Nền phụ cho vùng nội dung chính
+/// - [surface]:         #FFFFFF  Bề mặt Card, Dialog, Panel trắng
+/// - [textPrimary]:     #1E293B  Tiêu đề, chữ đậm chính
+/// - [textSecondary]:   #64748B  Nội dung phụ, nhãn, mô tả
+/// - [textLight]:       #FFFFFF  Chữ trắng trên nền đậm
+/// - [border]:          #E2E8F0  Đường viền mỏng tinh tế
+///
+/// Legacy aliases (dùng để tương thích, không dùng cho code mới):
+/// - [primaryAction]  → primary
+/// - [primaryBackground] → primaryLight
+/// - [surfaceAlt]     → background
 class AppColors {
   AppColors._();
 
-  // 4 mã màu thương hiệu
-  static const Color primaryBackground = Color(0xFFEBEAFF);
-  static const Color secondary = Color(0xFF9694FF);
-  static const Color primaryAction = Color(0xFF3D3BF3);
-  static const Color danger = Color(0xFFFF2929);
+  // === Thương hiệu Burgundy ===
+  static const Color primary = Color(0xFF9F1239);
+  static const Color deep = Color(0xFF500724);
+  static const Color secondary = Color(0xFFE8B4BC);
+  static const Color primaryLight = Color(0xFFFFF5F5);
+  static const Color accent = Color(0xFFD4A373);
 
-  // Bảng màu trung tính chuẩn hóa theo yêu cầu
-  static const Color surface = Colors.white;
-  static const Color surfaceAlt = Color(0xFFF9F9FD);
-  static const Color textPrimary = Color(0xFF25234A); // Tiêu đề
-  static const Color textSecondary = Color(0xFF6B6985); // Nội dung phụ
-  static const Color textLight = Colors.white;
-  static const Color border = Color(0xFFE2E1F8); // Viền nhẹ
-  static const Color borderSubtle = Color(0xFFEDEDFA);
+  // === Trung tính ===
+  static const Color background = Color(0xFFFAF7F7);
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color textPrimary = Color(0xFF1E293B);
+  static const Color textSecondary = Color(0xFF64748B);
+  static const Color textLight = Color(0xFFFFFFFF);
+  static const Color border = Color(0xFFE2E8F0);
+  static const Color borderSubtle = Color(0xFFF1F5F9);
+
+  // === Ngữ nghĩa ===
+  static const Color success = Color(0xFF15803D);
+  static const Color warning = Color(0xFFD97706);
+  static const Color danger = Color(0xFFDC2626);
+
+  // === Legacy aliases (tương thích ngược) ===
+  static const Color primaryAction = primary;
+  static const Color primaryBackground = primaryLight;
+  static const Color surfaceAlt = background;
 }
 
 /// Theme dùng chung toàn hệ thống, tuân thủ nguyên tắc phân cấp thị giác hiện đại.
@@ -41,15 +58,15 @@ class AppTheme {
   static ThemeData get lightTheme {
     final colorScheme = ColorScheme(
       brightness: Brightness.light,
-      primary: AppColors.primaryAction,
+      primary: AppColors.primary,
       onPrimary: AppColors.textLight,
       secondary: AppColors.secondary,
-      onSecondary: AppColors.textLight,
+      onSecondary: AppColors.textPrimary,
       error: AppColors.danger,
       onError: AppColors.textLight,
       surface: AppColors.surface,
       onSurface: AppColors.textPrimary,
-      surfaceContainerHighest: AppColors.surfaceAlt,
+      surfaceContainerHighest: AppColors.background,
       outline: AppColors.secondary,
       outlineVariant: AppColors.border,
     );
@@ -57,7 +74,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: AppColors.surface, // Dùng nền trắng sạch sẽ
+      scaffoldBackgroundColor: AppColors.background,
 
       // Cấu hình AppBar: Nền trắng sạch, viền dưới mỏng, chữ đậm rõ nét
       appBarTheme: const AppBarTheme(
@@ -75,12 +92,12 @@ class AppTheme {
         ),
       ),
 
-      // Nút bấm chính (FilledButton)
+      // Nút bấm chính (FilledButton) — Burgundy
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: AppColors.primaryAction,
+          backgroundColor: AppColors.primary,
           foregroundColor: AppColors.textLight,
-          disabledBackgroundColor: AppColors.secondary.withValues(alpha: 0.35),
+          disabledBackgroundColor: AppColors.secondary.withValues(alpha: 0.5),
           disabledForegroundColor: AppColors.textLight.withValues(alpha: 0.7),
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -98,36 +115,33 @@ class AppTheme {
       // Nút viền (OutlinedButton)
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primaryAction,
+          foregroundColor: AppColors.primary,
           side: const BorderSide(color: AppColors.border, width: 1.2),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          textStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ),
 
       // Nút chữ (TextButton)
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.primaryAction,
+          foregroundColor: AppColors.primary,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          textStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ),
 
       // Trường nhập liệu (TextFormField)
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surfaceAlt,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        fillColor: AppColors.background,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: AppColors.border),
@@ -138,7 +152,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.primaryAction, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
@@ -148,8 +162,14 @@ class AppTheme {
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: AppColors.danger, width: 1.5),
         ),
-        labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
-        hintStyle: TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.6), fontSize: 14),
+        labelStyle: const TextStyle(
+          color: AppColors.textSecondary,
+          fontSize: 14,
+        ),
+        hintStyle: TextStyle(
+          color: AppColors.textSecondary.withValues(alpha: 0.6),
+          fontSize: 14,
+        ),
         prefixIconColor: AppColors.textSecondary,
         suffixIconColor: AppColors.textSecondary,
         errorStyle: const TextStyle(
@@ -159,7 +179,7 @@ class AppTheme {
         ),
       ),
 
-      // Card hiển thị: Viền mảnh tinh tế, giảm shadow thô
+      // Card hiển thị: Viền mảnh tinh tế, không shadow
       cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
@@ -194,9 +214,9 @@ class AppTheme {
         behavior: SnackBarBehavior.floating,
       ),
 
-      // FloatingActionButton
+      // FloatingActionButton — Burgundy
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: AppColors.primaryAction,
+        backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textLight,
       ),
     );

@@ -133,10 +133,9 @@ class _AuthGateState extends State<AuthGate> {
 }
 
 /// Màn hình chờ hiển thị trong khi kiểm tra phiên đăng nhập ban đầu.
-/// Tuân thủ hệ thống màu chuẩn hóa:
-/// - Primary background: #EBEAFF
-/// - Secondary: #9694FF
-/// - Primary action: #3D3BF3
+/// Tuân thủ hệ thống màu Burgundy chuyên nghiệp:
+/// - Primary: #9F1239 (Burgundy)
+/// - Primary Light: #FFF5F5
 class SplashLoadingView extends StatelessWidget {
   const SplashLoadingView({super.key});
 
@@ -152,13 +151,13 @@ class SplashLoadingView extends StatelessWidget {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: AppColors.primaryBackground,
+                color: AppColors.primaryLight,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(
                 Icons.school_rounded,
                 size: 34,
-                color: AppColors.primaryAction,
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(height: 20),
@@ -183,7 +182,7 @@ class SplashLoadingView extends StatelessWidget {
               height: 24,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: AppColors.primaryAction,
+                color: AppColors.primary,
               ),
             ),
           ],

@@ -257,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Text('Cập nhật thông tin hồ sơ thành công!'),
             ],
           ),
-          backgroundColor: AppColors.primaryAction,
+          backgroundColor: AppColors.primary,
           duration: Duration(seconds: 2),
         ),
       );
@@ -413,7 +413,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     _buildTopHeader(),
                     Expanded(
                       child: Container(
-                        color: AppColors.surfaceAlt,
+                        color: AppColors.background,
                         child: _buildCurrentView(),
                       ),
                     ),
@@ -445,14 +445,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                     },
                     backgroundColor: AppColors.surface,
-                    indicatorColor: AppColors.primaryBackground,
+                    indicatorColor: AppColors.primaryLight,
                     height: 64,
                     destinations: _visibleNavItems.map((item) {
                       return NavigationDestination(
                         icon: Icon(item.icon, size: 20),
                         selectedIcon: Icon(
                           item.activeIcon,
-                          color: AppColors.primaryAction,
+                          color: AppColors.primary,
                           size: 22,
                         ),
                         label: item.label,
@@ -465,17 +465,17 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Sidebar Desktop thanh lịch, nhẹ nhàng, có phân chia thương hiệu rõ ràng
+  /// Sidebar Desktop — Burgundy đậm, text trắng, chuyên nghiệp
   Widget _buildSidebar(bool extended) {
     return Container(
       width: extended ? 240 : 76,
       decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(right: BorderSide(color: AppColors.border, width: 1)),
+        color: AppColors.deep,
+        border: Border(right: BorderSide(color: AppColors.deep, width: 1)),
       ),
       child: Column(
         children: [
-          // Logo & Tên ứng dụng tinh tế ở góc Sidebar
+          // Logo & Tên ứng dụng
           Container(
             height: 64,
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -486,7 +486,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryAction,
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.circular(9),
                   ),
                   child: const Icon(
@@ -504,7 +504,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 0.5,
-                        color: AppColors.textPrimary,
+                        color: Colors.white,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -513,7 +513,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          const Divider(height: 1, color: AppColors.border),
+          Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
 
           // Danh sách các mục điều hướng
           Expanded(
@@ -528,12 +528,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.only(bottom: 4.0),
                   child: Material(
                     color: isSelected
-                        ? AppColors.primaryBackground
+                        ? Colors.white.withValues(alpha: 0.15)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                     child: InkWell(
                       onTap: () => _onNavDestinationSelected(item.targetIndex),
                       borderRadius: BorderRadius.circular(8),
+                      hoverColor: Colors.white.withValues(alpha: 0.08),
+                      splashColor: Colors.white.withValues(alpha: 0.12),
                       child: Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: extended ? 12 : 0,
@@ -548,8 +550,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               isSelected ? item.activeIcon : item.icon,
                               size: 20,
                               color: isSelected
-                                  ? AppColors.primaryAction
-                                  : AppColors.textSecondary,
+                                  ? Colors.white
+                                  : Colors.white.withValues(alpha: 0.65),
                             ),
                             if (extended) ...[
                               const SizedBox(width: 12),
@@ -562,8 +564,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ? FontWeight.w700
                                         : FontWeight.w500,
                                     color: isSelected
-                                        ? AppColors.primaryAction
-                                        : AppColors.textSecondary,
+                                        ? Colors.white
+                                        : Colors.white.withValues(alpha: 0.65),
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -579,7 +581,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          const Divider(height: 1, color: AppColors.border),
+          Divider(height: 1, color: Colors.white.withValues(alpha: 0.15)),
           // Nút Đăng xuất ở chân Sidebar
           Padding(
             padding: const EdgeInsets.all(12.0),
@@ -588,6 +590,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: InkWell(
                 onTap: _isLoggingOut ? null : _handleSignOut,
                 borderRadius: BorderRadius.circular(8),
+                hoverColor: Colors.white.withValues(alpha: 0.08),
                 child: Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: extended ? 12 : 0,
@@ -599,27 +602,27 @@ class _HomeScreenState extends State<HomeScreen> {
                         : MainAxisAlignment.center,
                     children: [
                       _isLoggingOut
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 18,
                               height: 18,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: AppColors.danger,
+                                color: Colors.white.withValues(alpha: 0.65),
                               ),
                             )
-                          : const Icon(
+                          : Icon(
                               Icons.logout_rounded,
-                              color: AppColors.danger,
+                              color: Colors.white.withValues(alpha: 0.65),
                               size: 20,
                             ),
                       if (extended) ...[
                         const SizedBox(width: 12),
-                        const Text(
+                        Text(
                           'Đăng xuất',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.danger,
+                            color: Colors.white.withValues(alpha: 0.65),
                           ),
                         ),
                       ],
@@ -684,14 +687,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 34,
                 height: 34,
                 decoration: BoxDecoration(
-                  color: AppColors.primaryBackground,
+                  color: AppColors.primaryLight,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: AppColors.border, width: 1),
                 ),
                 child: const Icon(
                   Icons.person_rounded,
                   size: 18,
-                  color: AppColors.primaryAction,
+                  color: AppColors.primary,
                 ),
               ),
               const SizedBox(width: 10),
@@ -910,12 +913,12 @@ class _HomeScreenState extends State<HomeScreen> {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: AppColors.primaryBackground,
+              color: AppColors.primaryLight,
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(
               Icons.school_rounded,
-              color: AppColors.primaryAction,
+              color: AppColors.primary,
               size: 26,
             ),
           ),
@@ -944,7 +947,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryBackground,
+                        color: AppColors.primaryLight,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -952,7 +955,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primaryAction,
+                          color: AppColors.primary,
                         ),
                       ),
                     ),
@@ -1074,10 +1077,10 @@ class _HomeScreenState extends State<HomeScreen> {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: AppColors.surfaceAlt,
+              color: AppColors.primaryLight,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: AppColors.primaryAction, size: 20),
+            child: Icon(icon, color: AppColors.primary, size: 20),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -1219,12 +1222,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
-                              color: AppColors.primaryBackground,
+                              color: AppColors.primaryLight,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
                               module.icon,
-                              color: AppColors.primaryAction,
+                              color: AppColors.primary,
                               size: 20,
                             ),
                           ),
@@ -1432,13 +1435,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             width: 52,
                             height: 52,
                             decoration: BoxDecoration(
-                              color: AppColors.primaryBackground,
+                              color: AppColors.primaryLight,
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
                               Icons.person_rounded,
                               size: 28,
-                              color: AppColors.primaryAction,
+                              color: AppColors.primary,
                             ),
                           ),
                           const SizedBox(width: 14),
@@ -1478,8 +1481,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               icon: const Icon(Icons.edit_rounded, size: 16),
                               label: const Text('Chỉnh sửa'),
                               style: FilledButton.styleFrom(
-                                backgroundColor: AppColors.primaryBackground,
-                                foregroundColor: AppColors.primaryAction,
+                                backgroundColor: AppColors.primaryLight,
+                                foregroundColor: AppColors.primary,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 14,
                                   vertical: 8,

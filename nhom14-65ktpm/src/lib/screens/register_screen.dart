@@ -6,11 +6,11 @@ import '../core/theme/app_theme.dart';
 
 /// Màn hình đăng ký tài khoản sinh viên/người dùng mới.
 ///
-/// Tuân thủ hệ thống màu chuẩn hóa:
-/// - Primary background: #EBEAFF
-/// - Secondary: #9694FF
-/// - Primary action: #3D3BF3
-/// - Danger/error: #FF2929
+/// Tuân thủ hệ thống màu Burgundy chuyên nghiệp:
+/// - Primary: #9F1239 (Burgundy)
+/// - Primary Light: #FFF5F5
+/// - Secondary: #E8B4BC
+/// - Danger/error: #DC2626
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -148,7 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             actions: [
               FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primaryAction,
+                  backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.textLight,
                 ),
                 onPressed: () {
@@ -173,7 +173,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Text('Đăng ký tài khoản thành công!'),
               ],
             ),
-            backgroundColor: AppColors.primaryAction,
+            backgroundColor: AppColors.primary,
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
           ),
@@ -201,10 +201,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surfaceAlt,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Đăng Ký Tài Khoản'),
-        backgroundColor: AppColors.primaryAction,
+        backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textLight,
         elevation: 0,
         leading: IconButton(
@@ -241,7 +241,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           width: 56,
                           height: 56,
                           decoration: BoxDecoration(
-                            color: AppColors.primaryBackground,
+                            color: AppColors.primaryLight,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
@@ -412,7 +412,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: FilledButton(
                           onPressed: _isLoading ? null : _handleRegister,
                           style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.primaryAction,
+                            backgroundColor: AppColors.primary,
                             foregroundColor: AppColors.textLight,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
