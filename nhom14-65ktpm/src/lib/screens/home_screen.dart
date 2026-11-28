@@ -7,6 +7,7 @@ import '../core/supabase_config.dart';
 import '../core/theme/app_theme.dart';
 import 'module_placeholder_screen.dart';
 import 'planning_tab_screen.dart';
+import 'project_repository_screen.dart';
 
 /// Mục điều hướng trong khung ứng dụng
 class AppNavItem {
@@ -750,24 +751,15 @@ class _HomeScreenState extends State<HomeScreen> {
         return _buildOverviewTab();
       case 1:
         if (role == 'lecturer' || role == 'admin') {
-          return const ModulePlaceholderScreen(
-            moduleTitle: 'Quản lý kho đồ án',
-            assignee: 'TV2 – Phạm Kim Anh',
-            description:
-                'Quản lý danh sách đồ án tốt nghiệp khóa trước '
-                'và quản trị dữ liệu kho lưu trữ dành cho Giảng viên / Ban quản trị.',
-            icon: Icons.inventory_2_rounded,
+          return ProjectRepositoryScreen(
+            key: ValueKey('repo_all_$role'),
+            userRole: role,
           );
         }
         if (role == 'student') {
-          return const ModulePlaceholderScreen(
-            moduleTitle: 'Kho đồ án tốt nghiệp',
-            assignee: 'TV2 – Phạm Kim Anh',
-            description:
-                'Tra cứu, tìm kiếm và tham khảo danh sách các đồ án tốt nghiệp khóa trước. '
-                'Bao gồm bộ lọc chuyên ngành, xem chi tiết đồ án, quản lý đồ án yêu thích '
-                'và đề xuất bổ sung đồ án.',
-            icon: Icons.library_books_rounded,
+          return ProjectRepositoryScreen(
+            key: const ValueKey('repo_student'),
+            userRole: role,
           );
         }
         return _buildRoleRestrictedPlaceholder('Kho đồ án');
@@ -799,11 +791,10 @@ class _HomeScreenState extends State<HomeScreen> {
         if (role != 'admin' && role != 'lecturer') {
           return _buildOverviewTab();
         }
-        return const ModulePlaceholderScreen(
-          moduleTitle: 'Duyệt đề xuất',
-          assignee: 'TV2 – Phạm Kim Anh',
-          description: 'Xem, duyệt hoặc từ chối đề xuất bổ sung đồ án vào kho.',
-          icon: Icons.fact_check_rounded,
+        return ProjectRepositoryScreen(
+          key: ValueKey('repo_pending_$role'),
+          userRole: role,
+          initialTabIndex: 1,
         );
       case 5:
         return _buildProfileTab();
